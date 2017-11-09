@@ -99,11 +99,11 @@
 ```
 
 ```
-	```python
-	#!usr/bin/env python
-	# -*- coding: utf-8 -*-
-	#多段代码
-	```
+    ```python
+    #!usr/bin/env python
+    # -*- coding: utf-8 -*-
+    #多段代码
+    ```
 ```
 
 ## 表格
