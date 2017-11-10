@@ -1,4 +1,3 @@
 # Learn
 
-Never forget what you want !  
-Keep Learning !!!
+Never forget what you want !  Keep Learning !!!
