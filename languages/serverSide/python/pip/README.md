@@ -60,6 +60,11 @@ Install twine
 ```
 pip install twine
 ```
+Install wheel
+
+```
+pip install wheel
+```
 Create some distributions in the normal way
 
 ```

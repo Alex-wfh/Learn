@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+
 import requests
 import sys
 
@@ -6,19 +9,13 @@ if sys.version > '3':
 else: 
     import urllib2
 
-wx_gw = 'https://way.jd.com/'
 
-def wx_get_req(company, method, params):
-    request_url = wx_gw + company + "/" + method
-    return requests.get(request_url, params)
+def wx_get_req(url, params):
+    return requests.get(url, params)
 
-def wx_post_req(company, method, params, img=None):
-    request_url = wx_gw + company + "/" + method
-    if img :
-        ret = file_get_contents(img)
-        return requests.post(request_url, params=params, data=ret)
-    else :
-        return requests.post(request_url, params)
+def wx_post_req(url, params, img=None, bodyStr=None):
+    ret = file_get_contents(img) if img else bodyStr
+    return requests.post(url, params=params, data=ret)
 
 #img to str
 def file_get_contents(filename, use_include_path = 0, context = None, offset = -1, maxlen = -1):
