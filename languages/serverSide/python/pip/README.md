@@ -25,16 +25,16 @@ try :
 except :
     from distutils.core import setup
 setup(
-    name='wx-sdk',
-    version='1.0.0',
+    name='wx_sdk',
+    version='1.0.5',
     description='wangxiang Python SDK',
     long_description=open('README.txt').read(),
-    author='Alex',
-    author_email='wufeihao@jd.com',
-    maintainer='Alex',
-    maintainer_email='wufeihao@jd.com',
+    author='wanxiang',
+    author_email='wanxiang@jd.com',
+    maintainer='wanxiang',
+    maintainer_email='wanxiang@jd.com',
     license='BSD License',
-    packages=['wx-sdk'],
+    packages=['wx_sdk'],
     url='https://wx.jcloud.com/',
     classifiers=[
         'Operating System :: OS Independent',
@@ -50,6 +50,7 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
 )
 ```
