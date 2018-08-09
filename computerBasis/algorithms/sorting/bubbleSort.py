@@ -14,4 +14,16 @@ def bubbleSort(L) :
         i -= 1
     return L
 
+def shortBubbleSort(L) :
+    i = len(L) - 1
+    exchanges = True
+    while i > 0 and exchanges :
+        exchanges = False
+        for j in range(i) :
+            if L[j] > L[j+1] :
+                exchanges = True
+                L[j], L[j+1] = L[j+1], L[j]
+        i -= 1
+    return L
+
 print( bubbleSort(L) )
