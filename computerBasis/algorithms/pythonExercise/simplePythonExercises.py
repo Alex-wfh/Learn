@@ -238,8 +238,10 @@ def exercise11_3() :
 def exercise12():
     import math
     def primeCheck(i):
+        if i%2 ==  0 :
+            return False
         check = True
-        for j in range(2, int(math.sqrt(i))):
+        for j in range(2, int(math.sqrt(i))+1):
             if i % j == 0 :
                 check = False
                 break
@@ -478,12 +480,221 @@ def exercise25_2():
         s += t
     print(s)
 
+"""
+题目26：利用递归方法求5!。
+"""
+def exercise26_1():
+    def fact(i, s=1):
+        if i <= 1 :
+            return s
+        else :
+            return fact(i-1, i*s)
+    print( fact(5) )
+        
+def exercise26_2():
+    def fact(i):
+        s = 0
+        if i == 0 :
+            s = 1
+        else :
+            s = i * fact(i-1)
+        return s
+    print( fact(5) )
+
+"""
+题目27：利用递归函数调用方式，将所输入的5个字符，以相反顺序打印出来。
+"""
+def exercise27():
+    def output(s):
+        if len(s) == 0 :
+            return
+        else :
+            print( s[-1] )
+            output(s[:-1])
+
+    s = input("input a string:")
+    output(s)
+
+"""
+题目28：有5个人坐在一起，问第五个人多少岁？他说比第4个人大2岁。问第4个人岁数，他说比第3个人大2岁。问第三个人，又说比第2人大两岁。问第2个人，说比第一个人大两岁。最后问第一个人，他说是10岁。请问第五个人多大？
+"""
+def exercise28():
+    age = 10
+    for i in range(4) :
+        age += 2
+    print( age )
+
+"""
+题目29：给一个不多于5位的正整数，要求：一、求它是几位数，二、逆序打印出各位数字。
+"""
+def exercise29():
+    i = int( input("input an integer:") )
+    s = str(i)
+    print( "%d位数" %len(s) )
+    for ss in s[::-1] :
+        print( ss )
+
+"""
+题目30：一个5位数，判断它是不是回文数。即12321是回文数，个位与万位相同，十位与千位相同。
+"""
+def exercise30_1():
+    i = int( input("input an integer:") )
+    s = str(i)
+    isPalindrome = True
+    for ii in range( int(len(s)/2) ):
+        if s[ii] != s[-ii-1] :
+            isPalindrome = False
+            break
+    print( isPalindrome )
+
+def exercise30_2():
+    def checkPalindrome(s):
+        if len(s) <= 1 :
+            return True
+        elif s[0] != s[-1] :
+            return False
+        else :
+            return checkPalindrome(s[1:-1])
+
+    i = int( input("input an integer:") )
+    s = str(i)
+    print( checkPalindrome(s) )
+
+"""
+题目31：请输入星期几的第一个字母来判断一下是星期几，如果第一个字母一样，则继续判断第二个字母。
+"""
+def exercise31():
+    dayMap = {"su":"Sunday", "m":"Monday", "tu":"Tuesday", "w":"Wednesday", "th":"Thursday", "f":"Friday", "sa":"Saturday"}
+    letter = input("first letter:").lower()
+    if letter in ["s","t"] :
+        letter += input("second letter:").lower()
+    print ( dayMap[letter] if letter in dayMap else "dada error" )
+
+"""
+题目32：按相反的顺序输出列表的值。
+"""
+def exercise32():
+    a = [1,2,3]
+    for i in a[::-1] :
+        print( i )
+
+"""
+题目33：按逗号分隔列表。
+"""
+def exercise32():
+    a = [1,2,3]
+    print( ",".join(str(i) for i in a) )
+
+"""
+题目34：练习函数调用。
+"""
+def exercise34():
+    def functionTest1( a, *args, **kwargs ):
+        print( a )
+        print( args )
+        print( kwargs )
+        print( "-" * 10 )
+    def functionTest2( a=1, b=2, c=3):
+        print( a )
+        print( b )
+        print( c )
+        print( "-" * 10 )
+
+    functionTest1( 1, 2, 3, x=4, y=5)
+    functionTest2( 0, 0 )
+    functionTest2( b=0, c=0 )
+
+"""
+题目35：文本颜色设置。
+"""
+def exercise35():
+    class bcolors:
+        HEADER = '\033[95m'
+        OKBLUE = '\033[94m'
+        OKGREEN = '\033[92m'
+        WARNING = '\033[93m'
+        FAIL = '\033[91m'
+        ENDC = '\033[0m'
+        BOLD = '\033[1m'
+        UNDERLINE = '\033[4m'
+    print( bcolors.WARNING + "警告的颜色字体?" + bcolors.ENDC )
+
+"""
+题目36：求100之内的素数。
+"""
+def exercise36():
+    import math
+    def primeCheck(i):
+        if i%2 ==  0 :
+            return False
+        check = True
+        for j in range(2, int(math.sqrt(i))+1):
+            if i % j == 0 :
+                check = False
+                break
+        return check
+    for i in range(100) :
+        if primeCheck(i) :
+            print(i)
+
+
+"""
+题目37：对10个数进行排序。
+"""
+def exercise37_1():
+    l = input("输入若干数字，以空格分隔：")
+    intList = [int(i) for i in l.split(" ")]
+    intList.sort()
+    print( " ".join([str(i) for i in intList]) )
+
+def exercise37_2():
+    l = input("输入若干数字，以空格分隔：")
+    intList = sorted( [int(i) for i in l.split(" ")] )
+    print( " ".join([str(i) for i in intList]) )
+
+"""
+题目38：求一个n*n随机矩阵主对角线元素之和。
+"""
+def exercise38():
+    import random
+    n = int(input("n:"))
+    matrix = [ [random.randint(0,100) for i in range(n)] for j in range(n) ]
+    for l in matrix :
+        print ( l )
+    print( sum( matrix[i][i] for i in range(n) ) )
+
+"""
+题目39：有一个已经排好序的数组。现输入一个数，要求按原来的规律将它插入数组中。
+"""
+def exercise39():
+    l = input("输入若干排序好的整数，以空格分隔：")
+    i = int(input("输入插入其中的整数："))
+    intList = [int(i) for i in l.split(" ")]
+    if i <= intList[0] :
+        rstList = [i] + intList
+    elif i >= intList[-1] :
+        rstList = intList + [i]
+    else :
+        for idx in range(len(intList)-1) :
+            if intList[idx] <= i < intList[idx+1] :
+                rstList = intList[:idx+1] + [i] + intList[idx+1:]
+                break
+    print( " ".join([str(i) for i in rstList]) )
+
+"""
+题目40：将一个数组逆序输出。
+"""
+def exercise40():
+    l = [ 1, 2, 3, 4, 5, 6 ]
+    print(l[::-1])
 
 """
 通过方法名运行方法，默认运行最后一个exercise
 """
 def runMethod(exerciseName=None):
-    if not exerciseName :
+    if exerciseName :
+        exerciseName = "exercise" + exerciseName
+    else :
         lastExercise = sorted( [ int( name.replace("exercise", "").split("_")[0] ) for name in globals().keys() if "exercise" in name ] )[-1]
         defList = [name for name in globals().keys() if "exercise%d"%lastExercise in name]
         lastDef = "_%d" %( sorted( [ int(_def.split("_")[1]) for _def in defList ] )[-1] ) if "_" in defList[0] else ""
