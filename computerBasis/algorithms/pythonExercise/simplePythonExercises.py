@@ -689,6 +689,92 @@ def exercise40():
     print(l[::-1])
 
 """
+题目41：模仿静态变量的用法。
+"""
+def exercise41():
+    def varfunc():
+        var = 0
+        print( 'var = %d' % var )
+        var += 1
+    for i in range(3):
+        varfunc()
+
+    class Static:
+        StaticVar = 5
+        def varfunc(self):
+            self.StaticVar += 1
+            print( self.StaticVar )
+
+    print( Static.StaticVar )
+    a = Static()
+    for i in range(3):
+        a.varfunc()
+
+"""
+题目42：学习使用auto定义变量的用法。
+"""
+def exercise42():
+    num = 2
+    def autofunc():
+        num = 1
+        print( 'internal block num = %d' % num )
+        num += 1
+    for i in range(3):
+        print( 'The num = %d' % num )
+        num += 1
+        autofunc()
+
+"""
+题目43：模仿静态变量(static)另一案例。
+"""
+def exercise43():
+    class Num:
+        nNum = 1
+        def inc(self):
+            self.nNum += 1
+            print( 'nNum = %d' % self.nNum )
+    nNum = 2
+    inst = Num()
+    for i in range(3):
+        nNum += 1
+        print( 'The num = %d' % nNum )
+        inst.inc()
+
+"""
+题目44：两个n*n随机矩阵，对应位置相加。返回新矩阵。
+"""
+def exercise44():
+    import random
+    import pprint
+    n = int(input("n:"))
+    matrix1 = [ [random.randint(0,100) for i in range(n)] for j in range(n) ]
+    matrix2 = [ [random.randint(0,100) for i in range(n)] for j in range(n) ]
+    pprint.pprint( matrix1 )
+    pprint.pprint( matrix2 )
+    pprint.pprint( [ [matrix1[i][j]+matrix2[i][j] for i in range(n)] for j in range(n) ] )
+
+"""
+题目45：统计 1 到 100 之和。
+"""
+def exercise45():
+    print( sum( range(1, 101) ) )
+
+"""
+题目46：求输入数字的平方，如果平方运算后小于 50 则退出。
+"""
+def exercise46():
+    while True :
+        num = int( input("input an int:") )
+        sq = num ** 2
+        print( sq )
+        if sq < 50 :
+            break
+
+
+
+
+
+"""
 通过方法名运行方法，默认运行最后一个exercise
 """
 def runMethod(exerciseName=None):
