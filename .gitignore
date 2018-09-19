@@ -1,3 +1,6 @@
 *.log
 *.DS_Store
 *.pyc
+
+[credential]
+    helper = store

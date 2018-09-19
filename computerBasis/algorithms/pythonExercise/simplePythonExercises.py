@@ -770,6 +770,47 @@ def exercise46():
         if sq < 50 :
             break
 
+"""
+题目47：两个变量值互换。
+"""
+def exercise47():
+    a = input("a:")
+    b = input("b:")
+    a, b = b, a
+    print("a = %s" %a)
+    print("b = %s" %b)
+
+"""
+题目48：数字比较。
+"""
+def exercise48():
+    a = int( input("a:") )
+    b = int( input("b:") )
+    if a > b :
+        print( "a > b" )
+    elif a == b :
+        print( "a = b" )
+    else :
+        print( "a < b" )
+
+"""
+题目49：使用lambda来创建匿名函数。
+"""
+def exercise49():
+    MAXIMUM = lambda x,y :  (x > y) * x + (x < y) * y
+    MINIMUM = lambda x,y :  (x > y) * y + (x < y) * x
+    a = 10
+    b = 20
+    print( 'The largar one is %d' % MAXIMUM(a,b) )
+    print( 'The lower one is %d' % MINIMUM(a,b) )
+
+"""
+题目50：输出一个随机数。
+"""
+def exercise50():
+    import random
+    print( random.randint(0,100) )
+
 
 
 
