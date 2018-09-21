@@ -811,7 +811,49 @@ def exercise50():
     import random
     print( random.randint(0,100) )
 
+"""
+题目51：学习使用按位与 & ,
+"""
+def exercise51():
+    print("1 & 3 = %d" %(1 & 3) )
+    print("2 & 3 = %d" %(2 & 3) )
+    print("4 & 3 = %d" %(4 & 3) )
 
+"""
+题目52：学习使用按位或 | 。
+"""
+def exercise52():
+    print("1 | 3 = %d" %(1 | 3) )
+    print("2 | 3 = %d" %(2 | 3) )
+    print("4 | 3 = %d" %(4 | 3) )
+
+"""
+题目53：学习使用按位异或 ^ 。
+"""
+def exercise53():
+    print("1 ^ 3 = %d" %(1 ^ 3) )
+    print("2 ^ 3 = %d" %(2 ^ 3) )
+    print("4 ^ 3 = %d" %(4 ^ 3) )
+
+"""
+题目54：取一个整数a从右端开始的4〜7位。
+"""
+def exercise54_1():
+    num = int( input("input an integer:") )
+    print( int(num/1000%10000) )
+
+def exercise54_2():
+    num = int( input("input an integer:") )
+    print( str(num)[-7:-3] )
+
+"""
+题目55：学习使用按位取反~。
+"""
+def exercise55():
+    print( "~1 = %d" % ~1 )
+    print( "~2 = %d" % ~2 )
+    print( "~3 = %d" % ~3 )
+    print( "~4 = %d" % ~4 )
 
 
 
