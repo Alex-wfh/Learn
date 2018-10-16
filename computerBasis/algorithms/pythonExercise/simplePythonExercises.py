@@ -856,7 +856,7 @@ def exercise55():
     print( "~4 = %d" % ~4 )
 
 """
-题目56-59：画图，各种图
+题目56-59，63-65：画图，各种图
 没啥用，别搞了
 """
 
@@ -881,8 +881,94 @@ def exercise60():
 1 9 36 84 126 126 84 36 9 1
 """
 def exercise61():
-    length = input( int("intput length:") )
-    
+    length = int( input("intput length:") )
+    triList = [[1]]
+    for i in range( 1, length ):
+        baseList = triList[i-1]
+        rowList = list()
+        for ii in range( i+1 ):
+            rowList.append( ( baseList[ii-1] if ii-1 >= 0 else 0 ) + ( baseList[ii] if ii < len(baseList) else 0 ) )
+        triList.append(rowList)
+    for row in triList :
+        print( " ".join( [str(r) for r in row] ) )
+
+"""
+题目62：查找字符串。
+"""
+def exercise62():
+    str1 = input("search string:")
+    str2 = input("in string:")
+    print( str2.find(str1) )
+
+"""
+题目66：输入3个数a,b,c，按大小顺序输出。
+"""
+def exercise66():
+    int1 = int( input("int1:") )
+    int2 = int( input("int2:") )
+    int3 = int( input("int3:") )
+    print( " ".join( [str(i) for i in sorted([int1, int2, int3])] ) )
+
+"""
+题目67：输入数组，最大的与第一个元素交换，最小的与最后一个元素交换，输出数组。
+"""
+def exercise67():
+    l = [int(i) for i in input("input ints split by ` `:").split(" ")]
+    maxIdx, minIdx = 0, -1
+    for idx, i in enumerate(l) :
+        if i > l[maxIdx] :
+            maxIdx = idx
+    l[maxIdx], l[0] = l[0], l[maxIdx]
+    for idx, i in enumerate(l) :
+        if i < l[minIdx] :
+            minIdx = idx
+    l[minIdx], l[-1] = l[-1], l[minIdx]
+    print(l)
+
+
+"""
+题目69：有n个人围成一圈，顺序排号。从第一个人开始报数（从1到3报数），凡报到3的人退出圈子，问最后留下的是原来第几号的那位。
+"""
+def exercise69_1():
+    n = int(input('请输入总人数:'))
+    l = range(1, n+1)
+    def getSurvival(l, n):
+        if len(l) == 1 :
+            return l[0]
+        newL = list()
+        for idx, val in enumerate(l) :
+            rem = ( idx + 1 + n ) % 3
+            if rem != 0 :
+                newL.append(val)
+        return getSurvival( newL, rem )
+    print( getSurvival(l, 0) )
+
+def exercise69_2():
+    n = int(input('请输入总人数:'))
+    l = [ i for i in range(1, n+1) ]
+    i = 1 
+    while len(l) > 1:
+        if i % 3 == 0:
+            l.pop(0)
+        else:
+            l.insert(len(l),l.pop(0))
+        i += 1
+    print(l[0])
+
+
+"""
+题目70：写一个函数，求一个字符串的长度，在main函数中输入字符串，并输出其长度。
+"""
+def exercise70():
+    s = input("input str:")
+    print( len(s) )
+
+
+
+
+
+
+
 
 """
 通过方法名运行方法，默认运行最后一个exercise
