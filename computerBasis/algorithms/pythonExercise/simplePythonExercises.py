@@ -963,8 +963,334 @@ def exercise70():
     s = input("input str:")
     print( len(s) )
 
+"""
+题目71：编写input()和output()函数输入，输出5个学生的数据记录。一直在用，这里就不写了。
+"""
 
+"""
+题目72：创建一个链表。过于简单，不写。
+"""
 
+"""
+题目73：反向输出一个链表。
+"""
+def exercise73():
+    l = input("input strs split by ` `:").split(" ")
+    print( l )
+    l.reverse()
+    print( l )
+    print( l[::-1] )
+
+"""
+题目74：列表排序及连接。
+"""
+def exercise74():
+    l = [int(i) for i in input("input ints split by ` `:").split(" ")]
+    print( l.sort() )
+    print( sorted(l) )
+    print( l + [1] )
+    
+"""
+题目75：放松一下，算一道简单的题目。mdzz，不写。
+"""
+
+"""
+题目76：编写一个函数，输入n为偶数时，调用函数求1/2+1/4+...+1/n,当输入n为奇数时，调用函数1/1+1/3+...+1/n。
+"""
+def exercise76_1():
+    i = int( input("input int:") )
+    def getSum(n):
+        s = 0
+        if n % 2 == 0 :
+            for i in range(2,n+1,2):
+                s += 1/i
+        else :
+            for i in range(1,n+1,2):
+                s += 1/i
+        return s
+    print( getSum(i) ) 
+
+def exercise76_2():
+    i = int( input("input int:") )
+    def getSum(n):
+        return sum( [ 1/i for i in range(n, 0, -2) ] )
+    print( getSum(i) )
+    
+"""
+题目77：循环输出列表，太简单，不写。
+"""
+
+"""
+题目78：找到年龄最大的人，并输出。请找出程序中有什么问题。{"li":18,"wang":50,"zhang":20,"sun":22}
+"""
+def exercise78_1():
+    person = {"li":18,"wang":50,"zhang":20,"sun":22}
+    maxAge = 0
+    for p,age in person.items() :
+        if age > maxAge :
+            maxAge = age
+            oldest = p
+    print( oldest )
+
+def exercise78_2():
+    person = {"li":18,"wang":50,"zhang":20,"sun":22}
+    print( sorted(person.items(), key=lambda e:e[1])[-1][0] )
+
+"""
+题目79：字符串排序。没啥意思，不写了。
+"""
+
+"""
+题目80：海滩上有一堆桃子，五只猴子来分。第一只猴子把这堆桃子平均分为五份，多了一个，这只猴子把多的一个扔入海中，拿走了一份。第二只猴子把剩下的桃子又平均分成五份，又多了一个，它同样把多的一个扔入海中，拿走了一份，第三、第四、第五只猴子都是这样做的，问海滩上原来最少有多少个桃子？
+"""
+def exercise80():
+    base = 1 #最后一只猴拿几个
+    while True :
+        x = base
+        s = 5*base+1 #猴子那之前桃子数
+        for i in range(4):
+            x = (x*5+1)/4
+            if not x.is_integer():
+                base += 1
+                break
+            s += x + 1
+        else :
+            break
+    print( s )
+
+"""
+题目81：809*??=800*??+9*?? 其中??代表的两位数, 809*??为四位数，8*??的结果为两位数，9*??的结果为3位数。求??代表的两位数，及809*??后的结果。
+"""
+def exercise81_1():
+    import math
+    for i in range( max(math.ceil(100/9), math.ceil(1000/809)), min(math.ceil(100/8),math.ceil(10000/809) ) ) :
+        print(i, 809*i)
+
+def exercise81_2():
+    for i in range(10,100) :
+        r = i*809
+        if r>=1000 and r<10000 and i*9>=100 and i*8<100:
+            print(i, r)
+
+"""
+题目82：八进制转换为十进制。
+"""
+def exercise82_1():
+    p = input('input a octal number:')
+    s = 0
+    for idx, i in enumerate( p[::-1] ):
+        s += int(i) * 8 ** idx
+    print( s )
+
+def exercise82_2():
+    p = input('input a octal number:')
+    print( sum(int(i)*8**idx for idx, i in enumerate( p[::-1] )) )
+        
+def exercise82_3():
+    p = input('input a octal number:')
+    print( int(p, 8) )
+
+"""
+题目83：求0—7所能组成的奇数个数。
+"""
+def exercise83():
+    ii = 24
+    s = 4+24 
+    for i in range(6,0,-1):
+        ii *= i
+        s += ii
+    print( s )
+
+"""
+题目84：连接字符串。
+"""
+def exercise84():
+   l = input("input ints split by ` `:").split(" ") 
+   print( ",".join(l) )
+
+"""
+题目85：输入一个奇数，然后判断最少几个 9 除于该数的结果为整数。
+"""
+def exercise85_1():
+    c = int( input("input a cardinal:") )
+    i = 9
+    cnt = 1
+    while i % c != 0:
+        i = i*10+9
+        cnt += 1
+    print( cnt )
+
+def exercise85_2():
+    c = int( input("input a cardinal:") )
+    i = 1
+    while( (10**i-1)%c != 0 ):
+        i += 1
+    print( i )
+
+"""
+题目86：两个字符串连接程序。太简单，不写。
+"""
+
+"""
+题目87：回答结果（结构体变量传递）。
+"""
+def exercise87():
+    class student:
+        x = 0
+        c = 0
+    def f(stu):
+        stu.x = 20
+        stu.c = 'c'
+    a = student()
+    a.x, a.c = 3, 'a'
+    f(a)
+    print( a.x, a.c )
+
+"""
+题目88：读取7个数（1—50）的整数值，每读取一个值，程序打印出该值个数的＊。太简单。
+"""
+
+"""
+题目89：某个公司采用公用电话传递数据，数据是四位的整数，在传递过程中是加密的，加密规则如下：每位数字都加上5,然后用和除以10的余数代替该数字，再将第一位和第四位交换，第二位和第三位交换。
+"""
+def exercise89():
+    fourInt = input("input a four-digit number:")
+    print( "".join([ str((int(i)+5)%10) for i in fourInt ][::-1]) )
+
+"""
+题目90：列表使用实例。
+"""
+def exercise90():
+    testList=[10086,'中国移动',[1,2,4,5]]  
+    print( len(testList) )
+    print( testList[1:] )
+    print( testList[-1] )
+    print( testList[1:2:-1] )
+    testList.append('i\'m new here!')  
+    print( testList.pop(1) )
+    matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]  
+    print( [row[1] for row in matrix] )#get a  column from a matrix  
+    print( [row[1] for row in matrix if row[1] % 2 == 0] )#filter odd item  
+    print( [row[1] if row[1] % 2 == 0 else "hehe" for row in matrix] )#filter odd item  
+    for idx, i in enumerate(matrix):
+        print( idx, i )
+
+"""
+题目91-95：时间函数举例。
+"""
+def exercise91():
+    import time
+    print( time.ctime(time.time()) )
+    print( time.asctime(time.localtime(time.time())) )
+    print( time.asctime(time.gmtime(time.time())) )
+    
+    start = time.time()
+    for i in range(3000):
+        if i % 1000 == 0 :
+            print( i )
+    end = time.time()
+ 
+    print( end - start )
+
+    start = time.clock()
+    for i in range(10000):
+        if i % 1000 == 0 :
+            time.sleep(0.1)
+            print( i )
+    end = time.clock()
+    print( 'different is %6.3f' % (end - start) )
+
+    #一个猜数游戏，判断一个人反应快慢。
+    import random
+    play_it = input('do you want to start.(\'y\' or \'n\')')
+    while play_it == 'y':
+        i = random.randint(0,100)
+        print( 'please input number you guess:\n' )
+        start = time.time()
+        guess = int(input('input your guess:\n'))
+        while guess != i:
+            if guess > i:
+                print( 'please input a little smaller' )
+                guess = int(input('input your guess:\n'))
+            else:
+                print( 'please input a little bigger' )
+                guess = int(input('input your guess:\n'))
+        end = time.time()
+        var = (end - start) 
+        print( "var:", var )
+        if var < 15:
+            print( 'you are very clever!' )
+        elif var < 30:
+            print( 'you are normal!' )
+        else:
+            print( 'you are stupid!' )
+        print( 'Congradulations' )
+        print( 'The number you guess is %d' % i )
+        play_it = input('do you want to play it again.')
+
+    #字符串日期转换为易读的日期格式。
+    from dateutil import parser
+    dt = parser.parse("Aug 28 2015 12:00AM")
+    print( dt )
+
+"""
+题目96：计算字符串中子串出现的次数。
+"""
+def exercise96():
+    str1 = input("iuput a string:")
+    str2 = input('input a substring:')
+    print( str1.count(str2) )
+
+"""
+题目97：从键盘输入一些字符，逐个把它们写到磁盘文件上，直到输入一个 # 为止。
+"""
+def exercise97():
+    from sys import stdout
+    filename = input("input file name :")
+    fp = open(filename,"w")
+    ch = input("input some string:\n")
+    while ch != '#':
+        fp.write(ch)
+        stdout.write(ch)
+        ch = input("")
+    fp.close()
+
+"""
+题目98：从键盘输入一个字符串，将小写字母全部转换成大写字母，然后输出到一个磁盘文件"test"中保存。
+"""
+def exercise98():
+    fp = open('test.txt','w')
+    string = input('please input a string:\n')
+    string = string.upper()
+    fp.write(string)
+    fp = open('test.txt','r')
+    print( fp.read() )
+    fp.close()
+
+"""
+题目99：有两个磁盘文件A和B,各存放一行字母,要求把这两个文件中的信息合并(按字母顺序排列), 输出到一个新文件C中。
+"""
+def exercise99():
+    fp = open('test1.txt')
+    a = fp.read()
+    fp.close()
+ 
+    fp = open('test2.txt')
+    b = fp.read()
+    fp.close()
+ 
+    fp = open('test3.txt','w')
+    print("".join(sorted(list(a+b))) )
+    fp.write( "".join(sorted(list(a+b))) )
+    fp.close()
+
+"""
+题目100：列表转换为字典。
+"""
+def exercise100():
+    i = ['a', 1]
+    l = ['b', 2]
+    print( dict([i,l]) )
 
 
 
