@@ -411,3 +411,295 @@ sequenceDiagram
 * IP 地址：网络号（NetID）+ 子网号（SubID）+ 主机号（HostID）
 * 子网掩码：形如 IP 地址
   * NetID，SubID取”1“，HostID 取”0“
+
+#### CIDR 与 路由聚合
+
+CIDR：Classless Inter Domain Routin（无类域间路由）
+
+* 消除传统A、B、C、D类地址界限
+* 融合子网地址与子网掩码，方便子网划分
+* 提高 IPv4 地址空间分配效率
+* 提高路由效率
+
+#### DHCP 协议
+
+DHCP：Dynamic Host Configuration Protocol（动态主机配置协议）
+
+* 从服务器动态获取 IP，CIDR
+* “即插即用”
+
+#### 网络地址转换（NAT）
+
+一个 IP 可以连多个网络设备，替换、记录、替换
+
+16bit 端口号字段，可同时支持2<sup>16</sup> 左右的并行连接
+
+###### 主要争议
+
+* 路由器只应处理到网络层
+* 违背端到端通信原则，应用开发者需要考虑 NAT 存在
+* 地址短缺问题应由 IPv6 来解决
+
+###### NAT 穿透问题解决方案
+
+1. 静态配置
+2. UpnP 协议（Universal Play and Play）
+3. 中继
+
+#### ICMP 协议
+
+ICMP：Internet Control Message Protocol（互联网控制报文协议）
+
+支持主机或路由器：差错（或异常）报告，网络探寻
+
+###### 差错报告（5种）
+
+* 目的不可达
+* 源抑制
+* 超时
+* 参数问题
+* 重定向
+
+###### 网络探询报文（2种）
+
+* 回声请求与应答报文
+* 时间戳请求与应答报文
+
+#### IPv6 vs IPv4
+
+###### IPv6 的变化
+
+* 128bit
+* 40bit 基本首部
+* 不允许分片
+* 彻底移除校验和
+
+###### 共存方式：隧道
+
+IPv6数据报作为 IPv4 数据报的载和进行分装，穿越 IPv4 网络
+
+#### 路由算法
+
+确定去往目的主机/网络的最佳路径
+
+###### 分类
+
+* 静态路由 vs 动态路由
+* 全局信息 vs 分散信息
+
+###### 算法
+
+* Dijkstra
+* 距离向量（Distance Vector）
+* 层次路由
+
+###### 协议
+
+* RIP（Routing Information Protocol）
+* OSPF（Open Shortest Path Protocol）
+* BGP（Border-Gateway Protocol)
+
+## 链路层
+
+#### 链路层服务
+
+* 组帧（framing）
+
+* 链路接入（link access）
+* 相邻结点间可靠交付
+* 流量控制（flow control）
+* 差错控制（error detection）
+* 差错纠正（error correction）
+* 全双工和半双工通信控制
+
+#### 差错编码
+
+D -> DR
+
+D：Datagram
+
+R：差错检测，差错纠正比特
+
+#### MAC 协议
+
+MAC：Media Accesss Control（多路访问控制协议），采用分布式算法决定节点如何共享信道
+
+三大类：
+
+* 信道划分（channel partitioning），多路复用
+* 随机访问（random access），允许冲突
+* 轮转（taking turns），结点轮流使用信道
+
+#### MAC 地址
+
+32位 IP 地址，接口的网络层地址，每块网卡都有唯一的 MAC 地址
+
+#### 以太网
+
+不可靠，无连接服务
+
+目前主流网络拓扑：星型，中心交换机（switch），每个结点一个单独冲突域（彼此间不冲突）
+
+#### 路由器 vs 交换机
+
+###### 均为存储转发设备
+
+* 路由器：网络层设备（检测网络层分组首部）
+* 交换机：链路层设备（检测链路层帧的首部）
+
+###### 均使用转发表
+
+* 路由器：利用路由算法计算，依据 IP 地址
+* 交换机：利用自学习，洪泛构建转发表，依据 MAC 地址
+
+#### 网络设备对比
+
+|            | 集线器 | 交换机 | 网桥 | 路由器 |
+| ---------- | ------ | ------ | ---- | ------ |
+| 层次       | 1      | 2      | 2    | 3      |
+| 流量隔离   | no     | yes    | yes  | yes    |
+| 广播域隔离 | no     | no     | no   | yes    |
+| 即插即用   | yes    | yes    | yes  | no     |
+| 优化路由   | no     | no     | no   | yes    |
+| 直通传输   | yes    | yes    | yes  | no     |
+
+#### 虚拟局域网（VLAN）
+
+VLAN：Vitual Local Area Network
+
+一组逻辑上的设备，根据某些因素将它们组织起来，相互间通信就好像在同一个网段中一样
+
+工作在链路层和网络层
+
+特点：
+
+* 网络设备移动、添加、修改的管理开销少
+* 可控制广播活动
+* 提高网络的安全性
+
+#### 802.11 无线局域网
+
+###### 概念：
+
+* 基站（Base Station） =  访问点（Access Point，AP）
+
+* 基本服务集（Basic Server Set，BSS），也称为单元（cell）
+
+###### 主机必须与某个 AP 关联
+
+* 被动扫描
+  * 各 AP 发送信标帧
+  * 主机向选择的 AP 发送请求帧
+  * AP 向主机发送响应帧
+* 主动扫描
+  * 主机主动广播探测请求帧
+  * AP 发送探测响应帧
+  * 主机向选择的 AP 发送关联请求帧
+  * AP 向主机发送响应帧
+
+###### 多路访问控制
+
+CSMA/CA
+
+* 发送端首先利用 CSMA 向 AP 发送一个很短的 RTS（request-to-send）帧，RTS 帧可能彼此冲突，但 RTS 很短
+
+* AP 广播一个 CTS（clear-to-send）帧作为对 RTS 的响应
+
+* CTS 帧可被所有结点接收，消除隐藏站影响
+* 发送端可以发送数据帧，其他节点推迟发送
+
+## 网络安全
+
+#### 概念
+
+网络系统的硬件、软件及其系统中的数据受到保护，不因偶然的或恶意的原因而受到破坏、更改、泄露，系统连续可靠正常地运行，网络服务不断中断。
+
+#### 基本属性
+
+* 机密性（confidentiality）
+* 身份认证（authentication）
+* 信息完整性（message integrity）
+* 可访问与可用性（access and availability）
+
+#### 基本特征
+
+* 相对性
+* 时效性
+* 相关性
+* 不确定性
+* 复杂性
+* 重要性
+
+#### 研究领域
+
+* 入侵者（bad guys）如何攻击计算机网络
+* 如何防护网络对抗攻击
+* 如何设计网络体系结构免疫攻击
+
+#### 拟人模型
+
+拟人场景：Alice、Bob、Trudy
+
+Bob 与 Alice 是期待进行安全通信的双方
+
+Trudy 是企图破坏 Bob 和 Alice 通信的入侵者（intruder），试图拦截、删除或添加信息
+
+#### 威胁
+
+窃听、插入、假冒、劫持、拒绝服务Dos
+
+#### Internet 安全威胁
+
+* 映射（Mapping）
+  * 发起攻击前“探路”，ping 确定网络上的主机地址+端口扫描（Port-scanning），依次尝试与每个端口建立连接
+* 分组“嗅探”（sniffing）
+  * 广播介质
+  * 混合（promiscuous）模式网络接口可以接受记录所有经过的帧/分组
+* IP 欺骗（Spoofing）
+  * 直接由应用生成“原始” IP 分组，可以设置分组的源 IP 地址字段为任意值
+* 拒绝服务 Dos（Denial of service）
+  * 向接收方恶意洪泛（flood）分组，淹没（swamp）接收方
+    * 带宽耗尽
+    * 资源耗尽
+  * 分布式拒绝服务攻击（DDos），多个源主机协同淹没接收方
+
+#### DDos 攻击过程
+
+1. 选择目标
+2. 入侵（break into）网络中主机（构造僵尸网络）
+3. 控制僵尸主机向目标发送分组
+
+###### 反射式 DDos 攻击
+
+1. 选择目标
+2. 入侵网络中主机
+3. 选择反射服务器
+4. 借助反射服务器向目标发起攻击
+
+#### 密码学基础（cryptography）
+
+```mermaid
+graph LR
+	st[明文<br>plaintext] --> ea[加密算法<br>encryption algorithm]
+	esk[加密密钥<br>encryption security key] --> ea
+	ea --> c[密文<br>ciphertext]
+	c --> da[解密算法<br>decryption algorithm]
+	dsk[解密密钥<br>decryption security key] --> da
+	da --> e[明文]
+
+```
+
+* m：明文
+* K<sub>A</sub>(m)：密文，利用密钥 K<sub>A</sub> 加密
+* K<sub>B</sub>(K<sub>A</sub>(m)) = m：看用 K<sub>B</sub> 解密
+* 对称密钥加密：Bob 和 Alice 共享相同（对称）密钥 K<sub>S</sub>
+* 公开密钥加密：发送者用接收者的公开密钥加密，接收者用自己的私有密钥解密
+
+#### 加密破解方法
+
+* 唯密文攻击：只有密文
+  * 暴力破解
+  * 统计分析
+* 已知明文攻击：已知（部分）明文以及与之匹配的密文
+* 选择明文攻击：可以获取针对选择的明文的密文
+
