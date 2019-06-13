@@ -6,12 +6,12 @@
 按下方目录结构创建文件夹
 
 ```
-wx-sdk #上传pip包所用目录
+pip-demo #上传pip包所用目录
 ├── README.txt #较长的说明文件
 ├── setup.py #pip上传的python文件
-└── wx-sdk #pip包
+└── pip_demo #pip包
     ├── __init__.py
-    └── wx_sdk.py
+    └── pip_demo.py
 ```
 
 setup.py文件内容如下
@@ -25,17 +25,17 @@ try :
 except :
     from distutils.core import setup
 setup(
-    name='wx_sdk',
-    version='1.0.5',
-    description='wangxiang Python SDK',
+    name='pip_demo',
+    version='varsion',
+    description='description',
     long_description=open('README.txt').read(),
-    author='wanxiang',
-    author_email='wanxiang@jd.com',
-    maintainer='wanxiang',
-    maintainer_email='wanxiang@jd.com',
+    author='authorName',
+    author_email='authorEmail',
+    maintainer='maintainerName',
+    maintainer_email='maintarnerEmail',
     license='BSD License',
-    packages=['wx_sdk'],
-    url='https://wx.jcloud.com/',
+    packages=['pip_demo'],
+    url='url',
     classifiers=[
         'Operating System :: OS Independent',
         'Intended Audience :: Developers',
