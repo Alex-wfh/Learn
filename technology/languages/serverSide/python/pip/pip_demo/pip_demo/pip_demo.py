@@ -10,10 +10,10 @@ else:
     import urllib2
 
 
-def wx_get_req(url, params):
+def get_req(url, params):
     return requests.get(url, params)
 
-def wx_post_req(url, params, img=None, bodyStr=None):
+def post_req(url, params, img=None, bodyStr=None):
     ret = file_get_contents(img) if img else bodyStr
     return requests.post(url, params=params, data=ret)
 
