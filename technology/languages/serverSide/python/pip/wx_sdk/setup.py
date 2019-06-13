@@ -6,17 +6,17 @@ try :
 except :
     from distutils.core import setup
 setup(
-    name='wx_sdk',
-    version='1.0.5',
-    description='wangxiang Python SDK',
+    name='pip_demo',
+    version='varsion',
+    description='description',
     long_description=open('README.txt').read(),
-    author='wanxiang',
-    author_email='wanxiang@jd.com',
-    maintainer='wanxiang',
-    maintainer_email='wanxiang@jd.com',
+    author='authorName',
+    author_email='authorEmail',
+    maintainer='maintainerName',
+    maintainer_email='maintarnerEmail',
     license='BSD License',
-    packages=['wx_sdk'],
-    url='https://wx.jcloud.com/',
+    packages=['pip_demo'],
+    url='url',
     classifiers=[
         'Operating System :: OS Independent',
         'Intended Audience :: Developers',
