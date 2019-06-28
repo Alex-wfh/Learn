@@ -52,10 +52,28 @@
 
 #### TCP/IP参考模型
 
-1. 应用层				HTTP(Web)	SMTP(Email)	 DNS	RTP(流媒体)
-2. 运输层								  TCP								UDP
-3. 网际层													    IP
-4. 网络接口层
+<table>
+  <tr>
+    <td style="text-align:center;">1. 应用层</td>
+    <td style="text-align:center;">HTTP(Web)</td>
+    <td style="text-align:center;">SMTP(Email)</td>
+    <td style="text-align:center;">DNS</td>
+    <td style="text-align:center;">RTP(流媒体)</td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">2. 运输层</td>
+    <td style="text-align:center;" colspan="2">TCP</td>
+    <td style="text-align:center;" colspan="2">UDP</td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">3. 网络层</td>
+    <td style="text-align:center;" colspan="4">IP</td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">4. 网络接口层</td>
+    <td style="text-align:center;" colspan="4"></td>
+  </tr>
+</table>
 
 #### 5层参考模型
 
@@ -78,15 +96,15 @@
 #### HTTP Request Method
 
 * 1.0
-  * GET			 请求	实体主体
-  * HEAD		  请求    实体头
-  * POST		   提交    新增/修改
+  * GET      请求    实体主体
+  * HEAD   请求    实体头
+  * POST    提交    新增/修改
 * 1.1
-  * PUT             修改
-  * DELETE       删除
-  * CONNECT  转发    建立加密连接
-  * OPTIONS   查看性能
-  * TRACE        测试、诊断
+  * PUT               修改
+  * DELETE         删除
+  * CONNECT    转发    建立加密连接
+  * OPTIONS 	查看性能
+  * TRACE          测试、诊断
 
 #### HTTP Status Code
 
