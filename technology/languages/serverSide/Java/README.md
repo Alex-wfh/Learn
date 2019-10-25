@@ -2009,16 +2009,6 @@ public static void main(String[] args){...}
 
  使用 Scanner 类可以很方便地获取用户的键盘输入，Scanner 是一个基于正则表达式的文本扫描器，它可以从文件、输入流、字符串中解析出基本类型和字符串值。Scanner 类提供了多个构造器，不同的构造器可以接收文件、输入流、字符串中解析数据。
 
-Scanner 主要提供类两个方法来扫描输入：
-
-* hasNextXxx()：是否还有下一个输入项，其中 Xxx 可以是 Int、Long 等代表基础数据类型的字符串。如果只判断是否包含下一个字符串，则直接使用 hasNext()。
-* nextXxx()：或取下一个输入项。
-
-事实上，Scanner 提供了两个简单的方法来逐行读取：
-
-* boolean hasNextLine()：返回输入源中是否还有下一行。
-* String nextLine()：返回输入源中下一行的字符串。
-
 ### 系统相关
 
 Java 程序在不同操作系统上运行时，可能需要取得平台相关的属性，或者调用平台命令来完成特定功能。Java 提供了 System 类和 Runtime 类来与程序的运行平台进行交互。
@@ -2060,5 +2050,1221 @@ Java7 新增类一个 Objects 工具类，它提供了一些工具方法来操�
 
 #### Java9 改进的 String、StringBuffer 和 StringBuilder 类
 
+##### 主要差别
 
+* String：不可变。
+* StringBuffer：可变且线程安全。
+* StringBuilder：可变且线程不安全，效率略高于 StringBuffer，优先考虑。
+
+Java9 以前字符串采用 char[] 数组来保存，每个字符占两个字节，Java9 开始，字符串采用 byte[] 数组再加一个 encoding-flag 字段来保存，因此每个字符只占一个字节。字符串的功能方法没有受到任何影响。
+
+#### Math 类
+
+* 用来完成复杂的数学运算。
+* 是一个工具类，构造器被定义为 private 的，因此无法创建 Math 类的对象。
+* Math 类中的所有方法都是类方法，可以直接通过类名来调用它们。
+* 除提供类大量静态方法外，还提供类两个变量：PI 和 E，分别是 π 和 e。
+
+#### Java7 的 ThreadLocalRandom 与 Random
+
+* Random 类专门用于生成一个伪随机数。
+* ThreadLocalRandom 是 Random 的增强版。有更好的线程安全性。
+
+#### BigDecimal 类
+
+* 用来精确表示、计算浮点数。
+* 创建 BigDecimal 对象时，优先使用 String 作为构造器参数来调用构造器，如使用 double，会发生精度丢失的问题。
+
+### 日期、时间类
+
+Java 提供了 Data 和 Calendar 用于处理日期、时间的类，包括创建日期、时间对象，获取系统当前日期、时间等操作。
+
+* Date 无法实现国际化，对不同属性也使用了前后矛盾的偏移量，已被淘汰。
+* Calendar 比较复杂。
+* Java8 提供了一套全新的日期时间库。
+
+#### Date 类
+
+Date 类已被淘汰，不推荐使用。
+
+#### Calendar 类
+
+Calendar 类是一个抽象类，所以不能使用构造器来创建 Calendar 对象。但它提供了几个 getInstance() 方法来获取 Calendar 对象，这些方法根据 TimeZone，Locale 类来获取特定的 Calendar。
+
+Calendar 与 Date 都是表示日期的工具类，它们可以直接自由转换。
+
+```java
+// 创建一个默认的 Calendar 对象
+Calendar calendar = Calendar.getInstance();
+// 从 Calendar 对象中取出 Date 对象
+Date date = calendar.getTime();
+// 通过 Date 对象获取对应的 Calendar 对象
+Calendar calendar2 = Calendar.getInstance();
+calendar2.setTime(date);
+```
+
+Calendar 类有如下几个注意点：
+
+* add 与 roll 的区别
+* 设置 Calend 的容错率
+* set() 方法延迟修改
+
+#### Java8 新增的日期、时间包
+
+Java8 开始专门新增了一个 java.time 包，包含很多常用的类，很好用。
+
+### 正则表达式
+
+String 类中有几个支持正则表达式的方法。除此之外 Java 还提供了 Pattern 和 Matcher 两个类专门用于提供正则表达式支持。
+
+Java 字符串中反斜杠本身需要转移，因此两个反斜杠（\\\\）实际上相当于一个。
+
+Pattern 对象用来保存正则表达式。Matcher 对象用来保存执行匹配所涉及的状态。因此正则表达式字符串须先被编译为 Pattern 对象，再利用该 Pattern 对象创建对应的 Matcher 对象。
+
+### 变量处理和方法处理
+
+Java9 引入类一个新的 VarHandle 类，并增强了原有的 MethodHandle 类。通过这两个类，Java 可以像动态语言一样引用变量、引用方法，并调用它们。
+
+#### MethodHandle
+
+MethodHandles.Lookup 方法专门用于获取 MethodHandle 和 VarHandle。
+
+为 Java 增加了方法引用的功能，方法引用的概念类似于 C 的“函数指针”。可以让 Java 动态调用某个方法。
+
+#### VarHandle
+
+VarHandle 也是一种动态调用机制，用来处理成员变量。
+
+### Java 的格式化
+
+* 使用 MessageFormat 处理包含占位符的字符串
+* 使用 NumberFormat 格式化数字
+* 使用 DateFormat 格式化日期、时间
+* 使用 SimpleDateFormat 格式化日期
+* Java8 在 java.time.format 包下提供了一个 DateTimeFormatter 格式器类，功能非常强大，相当于 DateFromat 和 SimpleDateFormat 的合体。
+
+## Java 集合
+
+Java 集合类是一种特别有用的工具类，可用于存储数量不等的对象，并可以实现常用的数据结构。Java 集合大致可分为 Set、List、Queue 和 Map 四种体系。
+
+### Java 集合概述
+
+Java 的集合类主要由两个接口派生而出：Collection 和 Map，Collection 和 Map 是根接口，这两个接口又包含了一些字接口或实现类。
+
+### Collection 和 Iterator 接口
+
+Collection 接口是 List、Set 和 Queue 接口的父接口。
+
+#### 使用 Lambda 表达式遍历集合
+
+```java
+Collection books = new HashSet();
+books.forEach(obj -> System.out.println("iteator book:" + obj));
+```
+
+#### 使用 Java8 增强的 Iterator 遍历集合元素
+
+```java
+...
+Iterator it = books.iterator();
+while (it.hasNext())
+{
+	String book = (String)it.next();
+  System.out.println("iteator book:" + book);
+}
+```
+
+#### 使用 Lambda 表达式遍历 Iterator
+
+```java
+...
+it.forEachRemaining(obj -> System.out.println("iteator book:" + obj);
+```
+
+#### 使用 foreach 循环遍历集合元素
+
+```java
+...
+for (Object obj : books)
+{
+	String book = (String)obj;
+  System.out.println("iteator book:" + book);
+}
+```
+
+#### 使用 Java8 新增的 Predicate 操作集合
+
+```java
+...
+Predicate p = ele -> ((String)ele).length() < 10;
+books.removeIf(p);
+System.out.println(book);
+```
+
+#### 使用 Java8 新增的 Stream 操作集合
+
+使用步骤如下：
+
+* 使用 Stream 的 builder() 类创建该 Stream 对应的 Builder；
+* 重复调用 Builder 的 add() 方法向该流种添加多个元素；
+* 调用 Builder 的 build() 方法获取对应的 Stream；
+* 调用 Stream 的聚集方法。
+
+### Set 集合
+
+Set 集合与 Collection 基本相同，只是不允许包含重复元素。
+
+#### HashSet 类
+
+HashSet 类具有以下特点：
+
+* 不保证元素的排列顺序
+* 不同步，多线程使用需要通过代码保证其同步
+* 集合元素值可以是 null
+
+HashSet 去重原理：
+
+* equals() 方法判断是否存在，hashCode() 方法决定存储位置。
+* 若 equals() 方法返回 false 且 hashCode() 方法返回值不相等，正常存入。
+* 若 equals() 返回 true 但 hashCode() 返回值不相等，则存入 set，但位置不相同。
+* 若 equals() 返回 false 但 hashCode() 方法返回值相等，则存入 set，保存在同一位置，会在这个位置上用链式结构来保存多个对象。
+* 若 equals() 方法返回 true 且 hashCode() 方法返回值相等，不会进行存储操作。
+
+HashSet 中添加可变对象时必须十分小心，因为修改 HashSet  中的可变对象可能导致该对象与集合中其他对象相等，导致 HashSet 无法准确访问该对象
+
+#### LinkedHashSet 类
+
+HashSet 的子类，使用元素 hashCode 值来决定存储位置的同时，使用链表维护元素的次序。
+
+所以可按元素插入顺序来访问 LinkedHashSet
+
+#### TreeSet 类
+
+TreeSet 是 SortedSet 接口的实现类，它可以确保集合元素处于排序状态。
+
+TreeSet 排序方案可采用自然排序，也可定制排序。
+
+自然排序原理：
+
+* 调用集合元素的 compareTo(Object obj) 方法来比较元素之间的大小关系，然后将集合元素按升序排列。
+* 若 compareTo() 返回0，但 equals() 返回 false，TreeSet 不会让第二个元素添加进去。
+* 如果向 TreeSet 添加可变元素，并修改元素值，TreeSet 不会再次调整其顺序，这就可能导致操作该元素是出现错误。
+
+定制排序：
+
+* 定制排序规则，其他与自然排序原理相同。
+
+#### EnumSet 类
+
+EnumSet 是一个专门为枚举类设计的集合类，其中所有元素都必须是指定枚举类型的枚举值。EnumSet 也是有序的，以枚举值在 EnumSet 类内的定义顺序决定。
+
+EnumSet 不允许加入 null 元素。
+
+EnumSet 类没有暴漏任何构造器，应通过其提供的类方法来创建对象。
+
+#### 各 Set 实现类的性能分析
+
+性能对比：
+
+* HashSet vs TreeSet：HashSet 总是性能好些（特别是常用的添加、查询元素等操作）。
+* HashSet vs LinkedHashSet：插入、删除等操作 HashSet 性能略好，遍历 LinkedHashSet 性能好。
+* EnumSet vs others：EnumSet 性能好。
+
+所有 Set 都是线程不安全的，多线程时通常可以通过 Collections 工具类的 synchronizedSortedSet 方法来“包装”该 Set 集合。
+
+### List 集合
+
+元素有序、可重复的集合，集合中没个元素都有其对应的顺序索引，可以通过索引来访问指定位置的集合元素。List 默认按元素的添加顺序设置元素的索引。
+
+#### Java8 改进的 List 接口和 ListIterator 接口
+
+List 作为 Collection 接口的子接口，在 Collection 接口的全部方法基础上增加了一些根据索引操作集合元素的方法。
+
+与 Set 只提供了一个 iterator() 方法不同，List 还额外提供了一个 listIterator() 方法，该方法返回一个 ListIterator 对象，相比于 Iterator，ListIterator 增加了向前迭代的功能，而且还可以通过 add() 方法向 List 集合中添加元素。
+
+#### ArrayList 和 Vector 实现类
+
+ArrayList 和 Vector 作为 List 类的两个典型实现，完全支持 List 接口的全部功能。
+
+ArrayList 和 Vector 类都是基于数组实现的 List 类，所以 ArrayList 和 Vector 类封装类一个动态的、允许再分配的 Object[] 数组。ArrayList 和 Vector 对象使用 initialCapacity 参数来设置该数组的长度，当添加元素超出数组长度时，它的 initalCapacity 会自动增加。
+
+如果向 ArrayList 或 Vector 中添加大量元素时，可使用 ensureCapacity(int minCapacity) 方法一次性地等价 initialCapacity，减少重新分配次数，从而提高性能。
+
+如不指定 initialCapacity，ArrayList 和 Vector 长度默认为 10。
+
+ArrayList 和 Vector 用法几乎相同，区别如下：
+
+* Vector 更老，有些重复的方法；
+* ArrayList 线程不安全，Vector 线程安全；
+* ArrayList 运行效率高于 Vector；
+
+不推荐使用 Vector。
+
+#### 固定长度的 List
+
+介绍数组时介绍了一个操作数组的工具类 Arrays，该工具提供了 asList(Object… a) 方法，该方法可以把一个数组或指定个数的对象转换成一个 List 集合，这个 List 集合既不是 ArrayList 实现类的实例，也不是 Vector 实现类的实例，而是 Arrays 的内部类 ArrayList 的实例。
+
+Arrays.ArrayList 是一个固定长度的 List 集合，程序只能遍历访问集合里的元素，不可增加、删除。
+
+### Queue 集合
+
+Queue 用于模拟队列这种数据结构，通常不允许随机访问队列中的元素。
+
+Queue 接口有一个 PriorityQueue 实现类，除此之外还有一个 Deque 接口，Deque 代表一个 “双端队列”，可以从两端来添加、删除元素。因此 Deque 也可以当成栈来使用。
+
+#### PriorityQueue 实现类
+
+PriorityQueue 保存队列元素的顺序不是按加入队列的顺序，而是按队列元素的大小进行重新排序。因此，当调用 peek() 方法或者 poll() 方法取出的是队列中最小的元素。
+
+PriorityQueue 支持自然排序和定制排序。
+
+#### Deque 接口与 ArrayDeque 实现类
+
+Deque 接口是 Queue 接口的子接口，代表一个“双端队列”。
+
+Deque 接口提供了一个典型的实现类：ArrayDeque，从名称就可以看出，它是一个基于数组实现的双端队列，与 ArrayList 实现机制类似。
+
+#### LinkedList 实现类
+
+LinkedList 类是 List 接口的实现类，它是一个 List 集合，可以根据索引来随机访问集合中的元素。除此之外，LinkedList 还实现了 Deque 接口，可以被当成双端队列来使用。
+
+LinkedList 与 ArrayList、ArrayDeque 的实现机制完全不同，ArrayList、ArrayDeque 内部以数组的形式来保存集合中的元素，因此随机访问集合元素时性能较差，但在插入、删除元素时性能比较出色（只需要改造指针所指的地址即可）。
+
+#### 各种线性表的性能分析
+
+Java 提供的 List 就是一个线性表接口，而 ArrayList、LinkedList 又是线性表的两种典型实现：基于数组和线性表和基于链的线性表。Queue代表了队列，Deque 代表了双端队列，下面对各种实现的性能进行分析。
+
+一般来说，数组以一块连续内存区来保存所有的数组元素，所以数组在随机访问时性能最好；而链表在执行插入、删操作时性能较好。总体来讲，ArrayList 的性能比 LinkedList 的性能要好。
+
+使用 List 集合有如下建议：
+
+* 对于 ArrayList，应使用随机访问方法（get）来遍历集合元素；对于 LinkedList，则应该采用迭代器（Iterator）来遍历。
+* 经常需要执行插入、删除操作来改变包含大量数据的 List 集合，可以考虑使用 LinkedList 集合。
+* 如果有多个线程需要同时访问 List 集合中的元素，应考虑使用 Collections 将集合包装成线程安全的集合。
+
+### Java8 增强的 Map 集合
+
+Map 用于保存具有映射关系的数据。
+
+Set 与 Map 之间的关系非常密切。如果把 Map 中 key-value 对中的 value 当成 key 的附庸，就可以像对待 Set 一样对待 Map 了。事实上，Map 提供了一个 Entity 内部类来封装 key-value 对，而计算 Entity 存储时则只考虑 Entity 封装的 key。
+
+Map 里的全部 value 放在一起，类似于一个 List，只不过这个“List”的索引是 Map 的 key。
+
+从 Java 源码来看，Java 是先实现了 Map，然后通过包装一个所有 value 都为 null 的 Map 就实现了 Set。但要注意，通常 Map 和 Set 在处理插入已存在的 key/元素 时逻辑不同，Map 是覆盖，而 Set 则是保留。
+
+Map 中包含一个内部类 Entity，该类封装了一个 key-value 对。
+
+#### Java8 改进的 HashMap 和 Hashtable 实现类
+
+HashMap 和 Hashtable 都是 Map 接口的典型实现类，它们之间的关系完全类似于 ArrayList 和 Vector。
+
+#### LinkHashMap 实现类
+
+使用双向链表来维护 key-value 对的次序，该链表负责维护 Map 的迭代顺序，迭代顺序与插入顺序保持一致。
+
+#### 使用 Properties 读写属性文件
+
+Properties 类是 Hashtable 类的子类，该对象在处理属性文件时特别方便，可以把 Map 对象和属性文件关联起来。常用的属性文件有 ini 文件、XML 文件等。
+
+#### SortedMap 接口和 TreeMap 实现类
+
+类似 SortedSet 和 TreeSet，Map 接口派生出 SortedMap 子接口，SortedMap 接口也有一个 TreeMap 实现类。
+
+TreeMap 就是一个红黑树数据结构，TreeMap 存储 key-value 对（节点）时，需要根据 key 对节点进行排序。TreeMap 可以保证所有的 key-value 处于有序状态。TreeMap 支持自然排序和定制排序。
+
+再此强调，Set 和 Map 的关系十分密切，Java 源码就是先实现了 HashMap、TreeMap 等集合，再通过包装一个所有 value 都为 null 的 Map 的集合实现了 Set 集合类。
+
+#### WeakHashMap 实现类
+
+WeakHashMap 与 HashMap 的用法基本相似，区别在于 HashMap 的 key 保留了对实际对象的强引用；WeakHashMap 的 key 只保留了对实际对象的弱引用。
+
+#### IdentityHashMap 实现类
+
+IdentityHashMap 实现类的机制与 HashMap 基本相同，区别在于 IdentityHashMap 处理两个 key 相等时判断的是完全相等（key1==key2），而 HashMap 则通过 equal() 方法判断。
+
+#### EnumMap 实现类
+
+EnumMap 是一个与枚举值一起使用的 Map 实现，EnumMap 中的所有 key 都必须是单个枚举类的枚举值。创建 EnumMap 时必须显式或隐式指定它对应的枚举类。EnumMap 具有如下特征：
+
+* EnumMap 内部以数组形式保存，紧凑、高效。
+* EnumMap 根据 key 的自然顺序（即枚举值在枚举类中的定义顺序）来维护 key-value 对的顺序。
+* EnumMap 不允许 null 做 key，允许 null 做 value。
+
+#### 各 Map 实现类的性能分析
+
+通常情况下：
+
+* HashMap 比 Hashtable 要快。
+* TreeMap 比 HashMap、Hashtable 要慢（尤其插入、删除操作）。
+* LinkedHashMap 比 HashMap 慢一点。
+* IdentityHashMap 与 HashMap 基本相同。
+* EnumMap 性能最好，但它只能使用同一个枚举值作为 key。
+
+### HashSet 和 HashMap 的性能选项
+
+HashSet 和 HashMap 都采用 hash 算法来决定 元素/key 的存储位置，并通过 hash 算法来控制集合的大小。
+
+hash 表里可以存储元素的位置被称为”桶（bucket）“，一般一个桶存一个元素，但 hash 表的状态是 open 的：再发生”hash 冲突“的情况下，单个桶会储存多个元素，这些元素以链表的形式存储。
+
+hash 表包含以下属性：
+
+* 容量（capacity）：hash 表中通的数量。
+* 初始化容量（initial capacity）。
+* 尺寸（size）：当前 hash 表中记录的数量。
+* 负载因子（load factor）：size/capacity，轻负载的 hash 表冲突少、适宜插入与查询，但使用 Iterator 迭代元素时比较慢。
+* 负载极限：决定了 hash 表的最大填满程度。默认为 0.75。
+
+这里体现了计算机技术的空间成本和时间成本互换和折中的理念。
+
+### 操作集合的工具类：Collections
+
+Collections 工具类提供了大量方法对集合元素进行排序、查询和修改等操作，还提供了将集合对象设置为不可变、对集合对象实现同步控制等方法。
+
+## 泛型
+
+所谓泛型，就是允许在定义类、接口时使用类型形参，这个类型形参（或叫泛型）将在声明变量、创建对象、调用方法时动态地指定（即传入实际的参数类型，也可称为类型实参）。
+
+### 深入泛型
+
+#### 定义泛型接口、类
+
+```java
+public interface List<E>{}
+public class Test<T>{}
+```
+
+ 尖括号中的内容就是泛型的实质。允许在定义接口、类时声明泛型形参，泛型形参在整个接口、类体内可以当成类型使用，几乎所有可使用普通类型的地方都可以使用这种泛型形参。
+
+包含泛型声明的类型可以在定义变量、创建对象时传入一个类型实参，从而可以动态地生成无数多个逻辑上的子类，但这种子类在物理上并不存在。
+
+#### 并不存在的泛型类
+
+不管为泛型形参传入哪一种类型实参，对于 Java 来说，它们依然被当成同一个类处理，在内存中也只占用一块内存空间，因此在静态方法、静态初始化块或者静态变量的声明和初始化中不允许使用泛型形参。
+
+### 类型通配符
+
+如果 Foo 是 Bar 的一个子类型（子类或子接口），而 G 是具有泛型声明的类或接口， G<Foo> 并不是 G<Bar> 的子类型。
+
+#### 使用类型通配符
+
+为了表示各种泛型 List 的父类，可以使用类型通配符，类型通配符是一个问号（?），将一个问号作为类型实参传给 List 集合，写作：List<?>（意思是元素类型未知的 List）。这个问号（?）被称为通配符，它的元素类型可以匹配任何类型。
+
+#### 设定类型通配符的上限
+
+```java
+// 泛型形参必须是 Test 子类的 List
+List<? extend Test>
+```
+
+#### 设定类型通配符的下限
+
+```java
+// 泛型形参必须是 Test 父类的 List
+List<? super Test>
+```
+
+#### 设定泛型形参的上限
+
+Java 泛型不仅允许在使用通配符形参时设定上限，也可以在定义泛型形参时设定上限。
+
+```java
+// 表示 T 类型必须是 Number 类或其子类，并且实现 java.io.Serializable 接口
+public class Test<T extends Number & java.io.Serializable>{}
+```
+
+### 泛型方法
+
+```java
+修饰符 <T, S> 返回值类型 方法名(形参列表){}
+
+static <T> void Collection(T[] a, Collection<T> c){}
+```
+
+该泛型方法定义了一个 T 泛型形参，这个 T 类型就可以在该方法内当成不同类型使用。
+
+#### 泛型方法和类型通配符的区别
+
+大部分时候可以使用泛型方法来代替类型通配符
+
+```java
+public interface Collection<E>{
+	void Collection(Collection<?> c);
+	void addAll(Collection<? extends E> c);
+}
+
+public interface Collection<E>{
+ <T> void Collection(Collection<T> c);
+ <T extends E> void addAll(Collection<T> c); 
+} 
+```
+
+这种情况下应该使用通配符：通配符就是被设计用来支持灵活的子类变化的。
+
+泛型方法允许泛型形参被用来表示一个或多个形参之间的类型依赖关系，或者方法返回值与参数之间的类型依赖关系。如果没有这样的依赖关系，就不应该使用泛型方法。
+
+如果有需要，可以同时使用泛型方法和通配符。
+
+类型通配符和泛型方法还有一个显著的区别：通配符既可以在方法签名中定义形参类型，也可以用于定义变量的类型；但泛型方法中的泛型形参必须在对应方法中显示声明。
+
+#### Java7 的“菱形”语法与泛型构造器
+
+一旦定义了泛型构造器，接下来在调用构造器时，就不仅可以让 Java 根据数据参数的类型来“推断”泛型形参的类型，而且程序员也可以显式地为构造器中的泛型形参指定实际的类型。
+
+Java7 新增的“菱形”语法允许调用构造器时在构造器后使用一对尖括号来代表泛型信息。但如果程序显示指定了泛型构造器中声明的泛型形参的实际类型，则不可以使用“菱形”语法。
+
+#### 泛型方法与方法重载
+
+重载泛型方法时要注意，泛型需要有上下限，且不能有交集，否则调用时可能报错，编译器可能无法确定调用哪个方法。
+
+#### Java8 改进的类型推断
+
+Java8 改进了泛型方法的类型推断能力，类型推断主要有如下两方面：
+
+* 可通过调用方法的上下文来推断泛型的目标类型。
+* 可在方法调用链中，将推断得到的泛型传递到最后一个方法。
+
+泛型推断不是万能的
+
+### 擦除和转换
+
+在严格的泛型代码里，带泛型声明的类总应该带着类型参数。但为了与老的 Java 代码保持一致，也允许在使用带泛型声明的类时不指定实际的类型。如果没有为这个泛型类指定实际的类型，此时被称作 raw type（原始类型），默认是声明该泛型形参时指定的第一个上限类型。
+
+当把一个具有泛型信息的对象赋给另一个没有泛型信息的变量时，所有尖括号之间的类型信息都将被扔掉。比如一个 List<String> 类型被转换为 List，则该 List 对集合元素的类型检查变成了泛型参数的上限（即 Object）。这种现象被称为“擦除”。
+
+从逻辑上看，List<String> 是 List 的子类，如果直接把一个 List 对象赋值给一个 List<String> 对象应该引起编译错误，但实际上并不会，编译器只会提示“未经检查的转换”，这种现象被称为“转换”。
+
+### 泛型和数组
+
+Java 泛型有一个很重要的设计原则：如果一段代码在编译时没有提出”[unchecked] 未经检查的转换“警告，则程序在运行时不会引发 ClassCastException 异常。正是基于这个原因，数组元素的类型不能包含泛型变量或泛型形参，除非是无上限的类型通配符。但可以声明元素类型包含泛型变量或泛型形参的数组。也就是说，只能声明 List<String>[] 形式的数组，不能创建 ArrayList<String>[10] 这样的数组对象。
+
+```java
+// 下面代码不合法
+List<String>[] l = new ArrayList<String>[10];
+
+// 可改用通配符
+List<?>[] l = new ArrayList<?>[10];
+```
+
+## 异常处理
+
+异常机制已经成为判断一门编程语言是否成熟的标准，异常机制可以使程序中的异常处理代码和正常业务代码分离，保证程序代码更加优雅，并可以提高程序的健壮性。
+
+Java 的异常机制主要依赖于 try、catch、finally、throw、throws 五个关键字，其中 try 关键字后紧跟一个花括号扩起来的代码块（花括号不可省略），简称 try 块，它里面放置可能引发异常的代码。catch 后跟对应的一个或多个异常类型和一个代码块，用于表明该 catch 块用于处理这种类型的代码块。多个 catch 块后还可以跟一个 finally 块，finally 块用于回收在 try 块里打开的物理资源，异常机制会保证 finally 块总被执行。throws 关键字主要在方法签名中使用，用于声明该方法可能抛出的异常；而 throw 用于抛出一个实际的异常，throw 可以单独作为语句使用，抛出一个具体的异常对象。
+
+Java 将异常分为两种，Checked 异常和 Runtime 异常，Java 认为 Checked 异常都是可以在编译阶段被处理的异常，所以它强制程序处理所有的 Checked 异常；而 Runtime 异常则无须处理。Checked 异常可以提醒程序员需要处理所有可能发生的异常，但 Checked 异常也给变成带来一些烦琐之处，所以 Checked 异常也是 Java 领域一个备受争议的话题。
+
+### 异常概述
+
+对于一个程序设计人员，需要尽可能的预知所有可能发生的情况，尽可能地保证程序在所有糟糕的情形下都可以运行。
+
+程序员开发程序的过程，是一个创造的过程，这个过程需要有全面的考虑，仅做“对”的事是远远不够的。
+
+通过条件判断做错误处理的机制主要有如下两个缺点：
+
+* 无法穷举所有的异常情况。因为人类知识的限制，异常情况总比可考虑到的情况多，总有“漏网之鱼”的异常情况，所以程序总是不够健壮。
+* 错误处理代码和业务实现代码混杂。严重影响程序的可读性，会增加程序维护的难度。
+
+使用 Java 的异常处理机制可以解决以上问题。
+
+### 异常处理机制
+
+Java 的异常处理机制可以让程序具有更好的容错性，让程序更加健壮。当程序运行出现意外情形时，系统会自动生成一个 Exception 对象来通知程序，从而实现将“业务功能实现代码”和“错误处理代码”分离，提供更好的可读性。
+
+#### 使用 try…catch 捕获异常
+
+把系统业务实现代码放在 try 块中定义，所有的异常处理逻辑放在 catch 块中进行处理。
+
+如果程序代码出现异常，系统会自动生成一个异常对象，该异常对象被提交给 Java 运行时环境，这个过程被称为抛出（throw）异常。
+
+当 Java 运行时环境收到异常对象时，会寻找能处理该异常对象的 catch 块，如果找到合适的 catch 块，则把该异常对象交给该 catch 块处理，这个过程被称为捕获（catch）异常；如果 Java 运行时环找不到捕获异常的 catch 块，则运行时环境终止，Java 程序也将退出。
+
+#### 异常类的继承体系
+
+Java 把所有的非正常情况分成两种：异常（Exception）和错误（Error），它们都继承 Throwable 父类。
+
+Error 错误，一般是指与虚拟机相关的问题，如系统崩溃、虚拟机错误、动态链接失败等，这种错误无法恢复或不可捕获，会导致应用程序中断。
+
+Exception 异常，一般指应用程序相关的问题，是程序设计时需要考虑的错误。
+
+异常捕获时，一定要先捕获小异常，再捕获大异常。
+
+#### Java7 新增的多异常捕获
+
+在 Java7 之前，没个 catch 块只能捕获一种类型的异常；从 Java7 开始，一个 catch 块可以捕获多种类型的异常。
+
+使用一个 catch 块捕获多种类型的异常时需要注意如下两个地方：
+
+* 多种异常类型之间用竖线（|）隔开。
+* 异常变量有隐式的 final 修饰，因此程序不能对异常变量重新赋值。
+
+#### 异常访问信息
+
+如果程序需要在 catch 块中访问异常对象的相关信息，则可以通过访问 catch 块的后异常形参来获得。
+
+#### 使用 finally 回收资源
+
+有些时候，程序在 try 块里打开了一些物理资源（例如数据库连接、网络连接和磁盘文件等），这些物理资源都必须显示回收。
+
+Java 的垃圾回收机制不会回收任何物理资源，只能回收对内存中对象所占用的内存。
+
+为了保证一定能回收 try 块中打开的物理资源，异常处理机制提供了 finally 块。除非在 try 块、finally 块中调用了退出虚拟机的方法，否则 finally 块总会被执行。
+
+尽量避免在 finally 块里使用 return 或者 throw 等导致方法终止的语句，否则可能出现一些奇怪的情况。
+
+#### 异常处理的嵌套
+
+异常处理可以互相嵌套，嵌套的深度没有明确的限制，但通常没有必要使用超过两层的嵌套异常处理，层次太深没有太大的必要，而且导致程序可读性降低。
+
+#### Java9 增强的自动关闭资源的 try 语句
+
+Java7 允许在 try 关键字后紧跟一对圆括号，圆括号可以声明、初始化一个或多个资源，此处的资源指的是必须在程序结束时显示关闭的资源，try 语句在该语句结束时自动关闭这些资源。
+
+Java9 再次增强了这种 try 语句，不要求在 try 后的圆括号内声明并创建资源，只需要自动关闭的资源有 final 修饰符或者是有效的 final，Java9 允许将资源变量放在 try 后面的圆括号内。
+
+### Checked 异常和 Runtime 异常体系
+
+只有 Java 语言提供了 Checked 异常，Checked 异常体现了 Java 的严谨性，它要求程序员必须注意该异常——要么显式声明抛出，要么显式捕获并处理它，总之不允许对 Checked 异常不闻不问。这是一种严谨的设计哲学，可以增加程序的健壮性。问题是：大部分的方法总是不能明确地知道如何处理异常，因此只能声明抛出该异常。所以 Checked 异常降低了程序开发的生产率和代码的执行效率。关于 Checked 异常的优劣，在 Java 领域是一个备受争论的问题。
+
+#### 使用 throws 声明抛出异常
+
+使用 throws 声明抛出异常的思路是，当前方法不知道如何处理这种类型的异常，该异常应该由上一级调用者处理。如果 main 方法也不知道如何处理这种类型的异常，也可以使用 throws 声明抛出异常，该异常将交给 JVM 处理。JVM 对异常的处理方法是：打印异常的跟踪栈信息，并终止程序运行。
+
+#### 方法重写时声明抛出异常的限制
+
+方法重写时，子类方法声明抛出的异常类型应该是父类方法声明抛出的异常类型或其子类。
+
+由此可见，使用 Checked 异常存在如下两大不便之处：
+
+* 必须显式处理 Checked 异常，增加变成复杂度。
+* 显示声明抛出 Checked 异常，会导致方法和异常耦合，重写该方法是会受到异常限制。
+
+使用 Runtime 异常比较方便，这种方式既可以享受“正常代码与错误处理代码分离”，“保证程序具有较好的健壮性”的优势，又可以避免因使用 Checked 异常带来的编程繁琐性。
+
+### 使用 throw 抛出异常
+
+#### 抛出异常
+
+如果需要在程序中自行抛出异常，则应使用 throw 语句，throw 语句可以单独使用，throw 语句抛出的不是异常类，而是一个异常实例，且每次只能抛出一个异常实例。
+
+#### 自定义异常类
+
+用户自定义的异常都应该继承 Exception 基类，若果希望自定义 Runtime 异常，则应该继承 RuntimeException 基类。定义异常类时通常需要提供两个构造器：一个无参数构造器和一个带一个字符串参数的构造器，这个字符串将作为该异常对象的描述信息。
+
+#### catch 和 throw 同时使用
+
+目前介绍的异常处理方式有如下两种：
+
+* 在出现异常的方法内捕获并处理异常，该方法的调用者将不能再次捕获该异常。
+* 在方法的签名中声明抛出该异常，将该异常完全交给方法调用者处理。
+
+在实际应用中往往需要更复杂的处理方式——当一个异常出现时，需要几个方法协作才能完全处理该异常。这就可以将 catch 和 throw 结合起来使用。
+
+#### 异常链
+
+对于真实的企业级应用而言，常常有严格的分层关系。当底层出现异常时，顶层通常不该将底层的异常抛给用户，原因如下：
+
+* 对于正常用户而言，底层没有任何帮助。
+* 对于恶意用户而言，将底层异常暴漏出去不安全。
+
+通常的做法是捕获原始异常，然后抛出新的异常，并把原始异常信息保存下来。这种操作称为“异常链”。
+
+JDK1.4 以后，所有 Throwable 的子类在构造器中都可以接受一个 cause 对象作为参数。这个 cause 就用来表示原始异常，这样可以把原始异常传递给新的异常，使得即使在当前位置创建并抛出了新的异常，也能通过这个异常链追踪到异常最初发生的位置。
+
+### Java 的异常跟踪栈
+
+异常对象的 printStackTrace() 方法用于打印异常的跟踪栈信息，根据 printStackTrace() 方法的输出结果，开发者可以找到异常的源头，并跟踪到异常一路触发的过程。
+
+### 异常处理规则
+
+成功的异常处理应实现如下4个目标：
+
+* 是程序代码混乱最小化。
+* 捕获并保留诊断信息。
+* 通知合适的人员。
+* 采用合适的方法结束异常活动。
+
+为达到这些目标，下面介绍一些异常处理的基本准则。
+
+#### 不要过度使用异常
+
+滥用异常的表现：
+
+* 把异常和普通错误混淆在一起，不在编写任何错误处理代码，而是以简单地抛出异常来代替所有的错误处理。
+* 使用异常处理来代替流程控制。
+
+异常处理机制的初衷是将不可预期异常的处理代码和正常的业务逻辑处理代码分离，因此绝不要使用异常处理来代替正常的业务逻辑判断。
+
+异常机制的效率比正常的流程控制效率差，所以不要使用异常处理来代替正常的程序流程控制。
+
+#### 不要使用过于庞大的 try 块
+
+过于庞大的 try 块中出现异常的可能性大大增加，从而导致分析异常原因的难度也大大增加。
+
+把大块的 try 块分割成多个可能出现异常的程序段落，并把它们放在单独的 try 块中，从而分别捕获并处理异常。
+
+#### 避免使用 Catch All 语句
+
+所谓 Catch All 语句指的是一种异常捕获模块，它可以处理程序发生的所有可能异常。这种处理方式有如下两点不足之处：
+
+* 所有的异常都采用相同的处理方式，导致无法对不同异常分情况处理，如果要分情况处理，则需要在 catch 块中使用分支语句进行控制，这是得不偿失的做法。
+* 可能将程序中的错误、Runtime 异常等可能导致程序终止的情况全部捕获到，从而“压制”了异常。一些“关键”异常，也会被“静悄悄”地忽略。
+
+#### 不要忽略捕获到的异常
+
+通常建议对异常采取适当措施，如：
+
+* 处理异常。
+* 重新抛出新异常。
+* 在合适的层处理异常。
+
+## MySQL 数据库与 JDBC 编程
+
+### JDBC 基础
+
+JDBC 的全程是 Java Database Connectivity，即 Java 数据库连接，它是一种可以执行 SQL 语句的 Java API。
+
+#### JDBC 简介
+
+通过使用 JDBC 就可以使用同一种 API 访问不同的数据库系统。Sun 公司制定了一组标准的 API，它们只是接口，没有提供实现类，这些实现类由各个数据库厂商提供实现。
+
+Sun 提供的 JDBC 可以完成以下三个基本工作：
+
+* 建立与数据库的连接。
+* 执行 SQL 语句。
+* 获得 SQL 语句的执行结果。
+
+#### JDBC 驱动程序
+
+数据库驱动程序是 Java 应用程序和数据库之间的转换层，数据库驱动程序负责将 Java 通过 JDBC 的调用映射成特定的数据库调用。
+
+### SQL 概述
+
+数据库会在标准的 SQL 语句基础上进行扩展，增加一些额外功能，显然这些功能不能在所有数据库系统上通用。因此，如果想让数据库应用程序可以跨数据库运行，则应尽量少用这些特定的扩展。
+
+#### 关系型数据库基本概念
+
+严格来说，数据库（Database）仅仅是存放用户数据的地方。当用户访问、操作数据库中的数据时，需要数据库管理系统（Database Management System，简称 DBMS）的帮助。习惯上常常把数据库和数据库管理系统笼统地称为数据库。
+
+DBMS 是所有数据的知识库，它负责管理数据的存储、安全、一致性、并发、恢复和访问等操作。DBMS 有一个数据字典（有时也被称为系统表），用于存储他拥有的每个事物的相关信息，例如名字、结构、位置和类型，这种关于数据的数据也被称为元数据（metadata）。
+
+从数据库发展历史中，按时间顺序主要出现如下几种类型的数据库系统：
+
+* 网状型数据库
+* 层次型数据库
+* 关系数据库
+* 面向对象数据库
+
+MySQL 数据库常用的两种存储机制：
+
+* MyISAM：早期，对事务支持不够好
+* InnoDB：提供事务安全的存储机制
+
+#### SQL 语句基础
+
+SQL（Structured Query Language），结构化查询语言，主要用于完成如下任务：
+
+* 在数据库中检索信息
+* 对数据库信息进行更新
+* 改变数据库结构
+* 更改系统的安全设置
+* 增加或回收用户对数据库、表的许可权限
+
+后面2个任务一般由数据库管理员（DBA）来执行。
+
+标准的 SQL 语句通常可分为如下类型：
+
+* 查询语句：select
+* DML（Data Manipulation Language，数据操作语言）：instert、update、delete
+* DDL（Data Definiton Language，数据定义语言）：create、alter、drop、truncate
+* DCL（Data Control Language，数据控制语言）：grant、revoke
+* 事务控制语句：commit、rollback、savepoint
+
+### JDBC 的典型用法
+
+#### 常用的接口和类
+
+* DriverManager：用于管理 JDBC 驱动的服务类，主要用来获取 Connection 对象。
+* Connection：代表数据库连接对象，每个 Connection 代表一个物理连接会话。
+* Statement：用于执行 SQL 语句的工具接口。
+* PreparedStatement：预编译的 Statement 对象。PreparedStatement 是 Statement 的子接口，允许数据库预编译 SQL 语句（语句中通常带有参数），以后每次执行只改变 SQL 命令的参数，性能更好。
+* ResultSet：结果集对象。
+
+#### JDBC 编程步骤
+
+1. 加载数据库驱动；
+2. 通过 DriverManager 获取数据库连接；
+3. 通过 Connection 对象创建 Statement 对象；
+4. 使用  Statement 对象执行 SQL 语句；
+5. 操作结果集；
+6. 回收数据库资源。
+
+### 执行 SQL 语句的方式
+
+* executeQuery() & executeUpdate() & excuteLargeUpdate()：执行查询、更新方法。
+* excute()：执行不确定类型的 SQL 语句。
+* PreparedStatement：反复执行类似的 SQL 语句。
+* CallableStatement：用于调用存储过程。
+
+PrepareStatement 好处：
+
+* 预编译，性能更好；
+* 无须拼接 SQL 语句，编程更简单；
+* 可以防止 SQL 注入，安全性更好。
+
+### 管理结果集
+
+#### 可滚动、可更新的结果集
+
+JDBC 使用 ResultSet 来封装执行查询得到的查询结果，然后通过移动 ResultSet 的记录指针来取出结果集中的内容。
+
+以默认方式打开的 ResultSet 是不可更新的，如需更新，需要在创建 Statement 或 PreparedStatement 时传入额外参数。
+
+#### 处理 Blob 类型数据
+
+Blob，Binary Long Object（二进制长对象）。当需要从 ResultSet 里取出 Blob 数据时，可以调用 ResultSet 的 getBlob(int columnIndex) 方法。
+
+#### 使用 ResultSetMetaData 分析结果集
+
+ResultSet 里包含一个 getMetaData() 方法，该方法返回该 ResultSet 对应的 ResultSetMetaData 对象，ResultSetMetaData 提供了大量返回 ResultSet 的描述信息的方法。
+
+### RowSet
+
+RewSet 接口继承了 ResultSet 接口。与 ResultSet 相比，RowSet 默认是可滚动、可更新、可序列化的结果集，而且作为 JavaBean 使用，因此能方便地在网络上传输，用于同步两端的数据。对于离线 RowSet 而言，程序在创建 RowSet 时已把数据从底层数据库读取到内存，因此可充分利用计算机内存，从而降低数据库服务器的负载，提高程序性能。
+
+### 事务处理
+
+事务是保证底层数据完整的重要手段，没有事务支持的数据库应用会非常脆弱。
+
+#### 事务的概念和 MySQL 事务支持
+
+事务是由一步或几步数据库操作序列组成的逻辑执行单元，这系列操作要么全部执行，要么全部放弃执行。
+
+##### 事务的四个特性（ACID）：
+
+* 原子性（Atomicity）：事务是程序中最小的执行单位。
+* 一致性（Consistency）：事务执行的结果，必须使数据库从一个一致性状态，变到另一个一致性状态。
+* 隔离性（Isolation）：各个事务的执行互不干扰。
+* 持续性（Durability）：也称为持久性（Persistence），事务一旦提交，操作将持久化。
+
+##### 数据库的事务由下列语句组成：
+
+* 一组 DML 语句
+* 一条 DDL 语句
+* 一条 DCL 语句
+
+DDL 和 DCL 语句最多只能有一条，因为 DDL 和 DCL 语句都会导致事务立即提交。
+
+##### 事务提交的两种方式：
+
+* 显式提交：使用 commit。
+* 自动提交：执行 DDL 或 DCL 语句，或程序正常退出。
+
+##### 事务回滚的两种方式
+
+* 显式回滚：使用 rollback。
+* 自动回滚：系统错误或强行退出。
+
+##### 事务语法
+
+```mysql
+set autocommit=0; # 开启事务，该命令行窗口里所有的 DML 语句都不会立即生效，使用 commit 来提交事务，或正常退出，或运行 DDL、DCL 语句会导致事务提交。
+
+start transaction; # 临时性地开始一次事务，正常退出不会导致事务提交。
+begin; # 同上
+
+commit; # 提交事务
+rollback; # 回滚事务
+
+savepoint a; # 设置事务中间点，可以让事务回滚到指定中间点。
+rollback to a; # 回滚到指定中间点。
+```
+
+#### JDBC 的事务支持
+
+JDBC 连接的事务支持由 Connection 提供，Connection 默认打开自动提交。
+
+当 Connection 遇到一个未处理的 SQLException 异常时，系统将会非正常退出，事务也会自动回滚。但如果程序捕获了该异常，就需要在异常处理块中显示地回滚事务。
+
+#### Java8 增强的批量更新
+
+JDBC 还提供了一个批量更新功能，使用批量更新时，多条 SQL 语句将被作为一批操作被同时收集，并同时提交。
+
+批量更新必须得到底层数据库支持。
+
+### 分析数据库信息
+
+大部分时候，只需要对指定数据表进行插入、查询、修改、删除等 CRUD 操作；但某些时候，程序需要动态地获取数据库的相关信息，例如数据表信息、列信息。此外，如果希望在程序中动态地利用底层数据库所提供的特殊功能，都需要动态分析数据库相关信息。
+
+JDBC 提供了 DatabaseMetaData 来封装数据库连接对应数据库的信息，通过 Connection 的 getMetaData() 方法就可以获取数据库对应的 DatabaseMetaData 对象。
+
+除使用 DatabaseMetaData 外，如果确定应用程序所使用的数据库系统，就可以通过数据库的系统表来分析数据库信息。
+
+##### DatabaseMetaData  与 数据库系统表的优缺点
+
+* DatabaseMetaData：更好的跨数据库特性，应用程序可做到与数据库无关，无法准确获得数据库的更多细节。
+* 数据库系统表：数据库系统信息更细、更精准，与底层数据库耦合严重。
+
+### 使用连接池管理连接
+
+数据库连接的建立及关闭是极耗费系统资源的操作，在多层结构的应用环境中，这种消耗对系统性能影响尤为明显。通过前面介绍的方式（DriverManager）获得的数据库连接，一个数据库连接对象均对应一个物理数据库连接，每次操作都打开一个物理连接，使用完后立即关闭连接。频繁地打开、关闭连接将造成系统性能低下。
+
+数据库连接池的解决方案是：当程序启动时，系统主动建立足够的数据库连接，并将这些连接组成一个连接池。每次应用请求数据库连接时，无须重新打开连接，而是从连接池中取出已有的连接使用，使用完后不再关闭数据库连接，而是直接将连接归还给连接池。连接池可大大提高程序的运行效率。
+
+资源池（Resource Pool）是对于资源共享情况的一种通用的设计模式，用于解决资源的频繁请求、释放所造成的性能下降。
+
+数据库连接池是 Connection 对象的工厂，其常用参数如下：
+
+* 数据库的初始连接数。
+* 连接池的最大连接数。
+* 连接池的最小连接数。
+* 连接池每次增加的容量。
+
+JDBC 的数据库连接池使用 javax.sql.DataSource 来表示，DataSource 只是一个接口，该接口通常由商用服务器（如 WebLogic、WebSphere 等）提供实现及开源组织提供实现（如 DBCP 和 C3P0 等）。
+
+DataSource 通常被称为数据源，它包含连接池和连接池管理两部分，但习惯上称之为连接池。
+
+## 注解（Annotation）
+
+注解是代码里的特殊标记，这些标记可以在编译、类加载、运行时被读取，并执行相应的处理。通过使用注解，程序开发人员可以在不改变原有逻辑的情况下，在源文件中嵌入一些补充的信息。代码分析工具、开发工具和部署工具可以通过这些补充信息进行验证或进行部署。
+
+注解提供了一种为程序元素设置元数据的方法，从某些方面来看，注解就像修饰符一样，可用于修饰包、类、构造器、方法、成员变量、参数、局部变量的声明，这些信息被储存在注解的“name=value”对中。
+
+注解能被用来为程序元素（类、方法、成员变量等）设置元数据。值得指出的是，注解不影响程序代码的执行，无论增加、删除注解，代码都始终如一地执行。如果希望让程序中的注解在运行时起一定的作用，只有通过某种配套的工具对注解中的信息进行访问和处理，访问和处理注解的工具统称 APT（Annotation Processing Tool）。
+
+### 基本注解
+
+使用注解时要在其前面增加 @ 符号，并把该注解当成一个修饰符使用，用于它支持的程序元素。
+
+Java 提供的5个基本注解如下：
+
+* @Override（覆盖、覆写）
+* @Deprecated（不赞成、弃用）
+* @SuppressWarnings（压抑告警）
+* @SafeVarargs（堆污染）
+* @FunctionalInterface（函数式接口）
+
+这5个基本注解都定义在 java.lang 包下。
+
+#### 限定重写父类方法：@Override
+
+@Override 用来指定方法覆载，可以强制一个子类必须覆盖父类方法。告诉编译器检查这个方法，保证父类要包含一个被该方法重写的方法，否则就会编译出错。
+
+@Override 只是修饰方法，不能修饰其他程序元素。
+
+#### 已过时方法：@Deprecated
+
+@Deprecated 用于表示某个程序元素（类、方法等）已过时，当程序使用已过时的类、方法时，编译器将会给出警告。
+
+#### 抑制编译器警告：@SupressWarnings
+
+@SupressWarnings 所修饰的程序元素（以及该程序元素中的所有子元素）取消指定的编译器警告。@SupressWarnings 会一直做用于该元素的所有子元素。
+
+#### ”堆污染“警告：@SafaVaragrgs
+
+把一个不带泛型的对象赋给一个带泛型的变量时，往往会发生”堆污染“。
+
+Java7 会在定义可能产生”堆污染“的方法是就发出”堆污染“警告，保证开发者”更早“地注意到程序中可能存在的”漏洞“。有些时候，开发者不希望看到这个警告，则可以使用如下三个方法来”抑制“这个警告。
+
+* @SafaVaragrgs 修饰方法。
+* @SuppressWarnings（”unchecked“）修饰方法。
+* 编译时使用 -Xlint:varargs 选项。
+
+#### 函数式接口：@FunctionalInterface
+
+@FunctionalInterface 用来指定某个接口必须是函数式接口。
+
+### JDK 的元注解
+
+JDK 除在 java.lang 下提供了5个基本注解外，还在 java.lang.annotation 包下提供了6个 Meta 注解（元注解），此处先介绍常用的4个元注解。
+
+* @Retention 只能用于修饰注解定义，用于指定被修饰的注解可以保留多长时间（作用域）。
+* @Target 只能用于修饰注解定义，用于指定被修饰的注解能用于修饰哪些程序单元。
+* @Documented 用于指定被该元注解修饰的注解类将被 javadoc 工具提取成文档，如果定义注解类时使用了 @Documented 修饰，则所有该注解修饰的程序元素的 API 文档中将会包含该注解说明。
+* @Inherited 用与指定被它修饰的注解将具有继承性——如果某个类使用了 @Xxx 注解（定义该注解时使用了 @Inherited 修饰）修饰，则其子类将自动被 @Xxx 修饰。
+
+### 自定义注解
+
+#### 定义注解
+
+定义新的注解类型使用 @interface 关键字（在原有的 interface 关键字前增加 @ 符号）。
+
+```java
+// 定义一个简单的注解类型
+public @interface Test{}
+```
+
+定义了该注解之后，就可以在程序的任何地方使用该注解，注解通常可用于修饰程序中的类、方法、变量、接口等定义。通常会把注解放在所有修饰符之前，而且由于使用注解时可能还需要为成员变量指定值，因而注解的长度可能较长，所以通常把注解单放一行。
+
+```java
+// 使用 @Test 修饰类定义
+@Test
+public class MyClass{
+	// 使用 @Test 修饰方法
+	@Test
+	public void info(){}
+}
+```
+
+注解可以带成员变量，成员变量在注解定义中以无形参的方法形式来声明，其方法名和返回值定义了该成员变量的名字和类型。
+
+```java
+public @interface MyTag{
+	// 定义带两个成员变量的注解
+	// 注解中的成员变量以方法的形式来定义
+	String name();
+	int age();
+}
+```
+
+一旦在注解里定义了成员变量之后，使用该注解时就应该为它的成员变量指定值。
+
+```java
+public class Test{
+	// 使用带成员变量的注解
+	@MyTag(name="xxx", age=6)
+	public void info(){}
+}
+```
+
+也可以在定义注解的成员变量时为其指定初始值（默认值），指定成员变量的初始值可用 default 关键字。
+
+```java
+public @interface MyTag{
+	// 定义两个带初始值的成员变量
+	String name() default "Alex";
+	ing age() default 17;
+}
+```
+
+如果为注解的成员变量指定了默认值，使用该注解时则可以不为这些成员变量指定值。
+
+根据注解是否可以包含成员变量，可以把注解分为如下两类：
+
+* 标记注解：没有定义成员变量的注解类型，仅利用自身的存在与否来提供信息。
+* 元数据注解：包含成员变量，可以接受更多的元数据。
+
+#### 提取注解信息
+
+使用注解修饰了类、方法、成员变量等成员之后，这些注解不会自己生效，必须由开发者提供相应的工具来提取并处理注解信息。
+
+Java 使用 java.lang.annotation.Annotation 接口来代表程序元素前面的注解，该接口是所有注解的父接口。Java5 在 java.lang.reflect 包下新增了 AnnotatedElement 接口，该接口代表程序中可以接受注解的程序元素。
+
+#### 注解示例
+
+##### 用 @Testable 标记注解标记那些方法是可测试的
+
+```java
+// 使用 @Retention 指定注解的有效期（保留到运行时）
+@Retention(RetentionPolicy.RUNTIME)
+// 使用 @Target 指定注解可以用于修饰方法
+@Target(ElementType.METHOD)
+// 定义一个标记注解
+public @interface Testable{}
+```
+
+如下 MyTest 测试用例中定义了多个方法，使用 @Testable 注解来标记哪些方法是可测试的。
+
+```java
+public class MyTest{
+	// 使用 @Testable 注解指定方法可测试
+	@Testable
+	public static void test1(){}
+	
+	@Testable
+	public static void test2(){
+		throw new Exception("出错了！");
+	}
+	
+	public static void test3(){}
+}
+```
+
+仅仅使用注解来标记程序元素对程序是不会有任何影响的，这也是 Java 注解的原则之一。为了让程序中的注解起作用，接下来必须为这些注解提供一个注解处理工具。下面的注解处理工具会分析目标类，如果目标类的方法使用了 @Testable 注解修饰，则通过反射来运行该测试方法。
+
+```java
+public class ProcessorTest{
+  public static void process(String clazz) throws ClassNotFoundException{
+    int passed = 0;
+    int failed = 0;
+    // 遍历 calzz 对应的类里的所有方法
+    for (Method m : Class.forName(clazz).getMethods()){
+      // 如果该方法使用了 @Testable 修饰
+      if (m.isAnnotationPresent(Testable.class)){
+        try{
+          // 调用 m 方法
+          m.invoke(null);
+          // 测试成功，passed 计数器加1
+          passed ++;
+        }catch (Exception ex){
+          System.out.println("方法" + m + "运行失败，异常：" + ex.getCause());
+        	failed ++;
+        }
+      }
+    }
+    // 统计测试结果
+    System.out.println("共运行了：" + (passed + failed)
+    	+ "个方法，其中失败了：" + failed + "个，成功了：" + passed + "个!");
+  }
+}
+```
+
+ProcessorTest 类里只包含一个 process(String clazz) 方法，该方法将分析 calzz 参数所代表的类，并运行该类里使用 @Testable 修饰的方法。
+
+```java
+public class RunTests{
+	public static void main(String[] args) throws Exception{
+		// 处理 MyTest 类
+		ProcessorTest.process("MyTest");
+	}
+}
+```
+
+通过上面的例子不难看出，其实注解十分简单，它对源代码增加了一些特殊标记，这些特殊标记可通过反射获取，当程序获取这些特殊标记后，可以做出相应的处理。
+
+##### 用 @ActionListenerFor 来为程序中的按钮绑定事件监听器
+
+```java
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ActionListenerFor{
+	Class<? extends ActionListener> listener();
+}
+```
+
+```java
+public class ActionListenerInstaller{
+  // 处理注解的方法，其中 obj 是包含注解的对象
+  public static void processAnnotations(Object obj){
+    try{
+      // 获取 obj 对象类
+      Class cl = obj.getClass();
+      // 获取指定 obj 对象的所有成员变量，并遍历每个成员变量
+      for (Field f : cl.getDeclaredFields()){
+        // 将该成员变量设置成自由访问
+        f.setAccessible(true);
+        // 获取该成员变量上 ActionListenerFor 类型的注解
+        ActionListenerFor a = f.getAnnotation(ActionListenerFor.class);
+        // 获取成员变量 f 的值
+        Object fObj = f.get(obj);
+        // 如果 f 是 AbstractButton 的实力，且 a 不为 null
+        if ( a != null && fObj != null && fObj instanceof AbstractButton){
+          // 获取 a 注解里的 listener 元数据（它是一个监听器类）
+          Class<? extends ActionListener> listenerClazz = a.listener();
+          // 使用反射来创建 listener 类的对象
+          ActionListener al = listenerClazz.newInstance();
+          AbstractButton ab = (AbstractButton) fObj;
+          // 为 ab 按钮添加事件监听器
+          ab.addActionListener(al);
+        }
+      }
+    }catch(Exception e){
+      e.printStachTrace();
+    }
+  }
+}
+```
+
+#### Java8 新增的重复注解
+
+Java8 以前，同一个程序元素最多只能使用一个相同类型的注解，如需使用多个，则必须使用注解“容器”。
+
+```java
+@Results({@Result(name="failure", location="failed.jsp")}),
+@Result(name="success", location="succ.jsp")
+public Acton FooAction{}
+```
+
+Java8 开始，上面语法得到简化。
+
+```java
+@Result(name="failure", location="failed.jsp")
+@Result(name="success", location="succ.jsp")
+public Acton FooAction{}
+```
+
+开发重复注解需要使用 @Repeatable 修饰，通过下面的示例来介绍如何开发重复注解。
+
+首先定义一个 FkTag注解。
+
+```java
+// 指定该注解信息会保留到运行时
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface FkTag{
+  // 为该注解定义两个成员变量
+  String name() default "疯狂软件";
+  int age();
+}
+```
+
+上面定义了 FkTag 注解，该注解包含两个成员变量，但该注解默认不能作为重复注解使用，如果使用两个以上的该注解修饰同一个类，编译器会报错。
+
+还需定义如下的“容器”注解。
+
+```java
+// 指定该注解信息会保留到运行时
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface FkTags{
+  // 定义 value 成员变量，该成员变量可接受多个 @FkTag 注解
+  FkTag[] value();
+}
+```
+
+“容器”注解的保留其必须大于等于它所包含的注解的保留期，否则编译器会报错。
+
+重复注解只是一种简化写法，是一种假象：多个重复注解其实会被作为“容器”注解的 value 成员变量的数组元素。
+
+### 编译时处理注解
+
+APT（Annotation Processing Tool）是一种注解处理工具，它对源代码文件进行检测，并找出源文件所包含的注解信息，然后针对注解信息进行额外的处理。
+
+使用 APT 工具处理注解时可以根据源文件中的注解生成额外的源文件和其他的文件，APT 还会编译生成的源代码文件和原来的源文件，将它们一起生成 class 文件。
+
+使用 APT 的主要目的是简化开发者的工作量，因为 APT 可以在编译程序源代码的同时生成一些附属文件（比如源文件、类文件、程序发布描述文件等）。换句话说，使用 APT 可以代替传统的对代码信息和附属文件的维护工作。
+
+Java 提供的 javac.exe 工具有一个 -processor 选项，该选项可以指定一个注解处理器，如果在编译 Java 源文件时，通过该选项指定类注解处理器，那么这个注解处理器将会在编译时提取并处理 Java 源文件中的注解。
+
+## 输入/输出（IO）
+
+Java 的 IO 通过 java.io 包下的类和接口来支持，在 java.io 包下主要包括输入、输出两种 IO 流，每种输入，输出流又可分为字符流和字节流两大类。
+
+Java 的 IO 流使用了一种装饰器设计模式，它将 IO 流分成底层节点流和上层处理流，其中节点流用于和底层的物理存储节点直接关联，程序可以把不同的物理节点流包装成统一的处理流，从而允许程序使用统一的输入、输出代码来读取不同的物理存储节点的资源。
+
+### File 类
+
+java.io 包下的 File 类可平台无关地操作文件和目录，能执行新建、删除、重命名等操作。File 不能访问文件内容，如需访问，需使用输入/输出流。
+
+#### 访问文件和目录
+
+File 类可以使用文件路径字符串来创建 File 实例，即可是绝对路径，也可是相对路径。默认情况下，系统根据用户工作路径来解释相对路径（即运行 Java 虚拟机时所在的路径），这个路径由系统属性“user.dir”指定。
+
+一旦创建了 File 对象后，就可以调用 File 对象的方法来访问，File 类提供了很多方法来操作文件和目录，主要有以下几类：
+
+* 访问文件名
+* 文件检测
+* 获取常规文件信息
+* 文件操作
+* 目录操作
+* 文件过滤
+
+Windows 的路径分隔符使用反斜线（\\），而 Java 程序中的反斜线表示转义字符，所以应使用两条反斜线（\\\\），或者直接使用斜线（/），Java 程序支持将斜线当成平台无关的路径分隔符。
+
+### 理解 Java 的 IO 流
+
+Java 的 IO 流是实现输入/输出的基础，它可以方便地实现数据的输入/输出操作，在 Java 中把不同的输入/输出源（键盘、文件、网络连接等）抽象表述为“流”（stream），通过流的的方式允许 Java 程序使用相同的方式访问不同的输入/输出源。stream 是从起源（source）到接收（sink）的有序数据。
+
+Java 把所有传统的流类型（类或抽象类）都放在 java.io 包中，用以实现输入/输出功能。
+
+#### 流的分类
+
+##### 按流的流向分类
+
+* 输入流：只能读取数据，不能写入数据。
+* 输出流：只能写入数据，不能读取数据。
+
+##### 按流操作的数据单元分类
+
+* 字节流：字节，8bit。主要由 InputStream 和 OutputStream 作为基类。
+* 字符流：字符，16bit。主要由 Reader 和 Writer 作为基类。
 

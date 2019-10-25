@@ -72,7 +72,7 @@ PCRE是目前最常用的正则表达式标准，可用于大部分高级语言�
 
 
 ## python regular expression
-```
+```python
 import re
 
 re.match(pattern, string, flags=0)
