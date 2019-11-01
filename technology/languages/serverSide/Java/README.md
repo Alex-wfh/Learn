@@ -3268,3 +3268,83 @@ Java 把所有传统的流类型（类或抽象类）都放在 java.io 包中，
 * 字节流：字节，8bit。主要由 InputStream 和 OutputStream 作为基类。
 * 字符流：字符，16bit。主要由 Reader 和 Writer 作为基类。
 
+#### Java 新 IO 概述
+
+新 IO 采用内存映射文件的方式来处理输入/输出，即将文件或文件的一段区域映射到内存中，这样就可以像访问内存一样访问文件来。这种方式比传统的 IO 要快得多。Java 中与新 IO 相关的包都在 java.nio 目录下。
+
+Channel（通道）和 Buffer（缓冲）是新 IO 中的两个核心对象。
+
+Channel 是对传统 IO 系统的模拟，在新 IO 系统中所有的数据都需要通过 Channel 传输；Channel 与传统的 InputStream、OutputStream 最大的区别在于它提供了一个 map()  方法，通过该方法可以直接将“一块数据”映射到内存中。如果说传统的 IO 系统是面向流的处理，新的 IO 则是面向块的处理。
+
+Buffer 可以被理解成一个容器，它的本质是一个数组，发送到 Channel 中的所有对象都必须先放到 Buffer 中，从 Channel 中读取的数据也必须放到 Buffer 中。
+
+除 Channel 和 Buffer 外，新 IO 还提供了用于将 Unicode 字符串映射成字节序列以及逆映射操作的 Charset 类，也提供了用于支持非阻塞式 IO 的 Selector 类。
+
+#### 使用 Buffer
+
+从内部结构上来看，Buffer 就像一个数组，它可以保存多个类型相同的数据。Buffer 是一个抽象类。
+
+在 Buffer 中有三个重要的概念：
+
+* 容量（capacity）：该 Buffer 的最大数据容量
+* 界限（limit）：第一个不该被读出或写入的缓冲区位置索引
+* 位置（position）：下一个可被读出或写入的缓冲区位置索引
+
+除此之外，Buffer 还支持一个可选的标记（mark），Buffer 允许直接将 position 定位到该 mark 处。
+
+以上这些指满足如下关系：
+
+```
+0 <= mark <= position <= limit <= capacity
+```
+
+通过 allocate() 方法创建的 Buffer 对象是普通 Buffer，ByteBuffer 还提供了 allocateDirect() 方法用于创建直接 Buffer。直接 Buffer 的创建成本比普通 Buffer 高很多，但直接 Buffer 的读取效率更高，所以直接 Buffer 只适用于长生存期的 Buffer。只能通过 ByteBuffer 来创建直接 Buffer，如希望使用其他类型，则应该将此 Buffer 转换成其他类型的 Buffer。
+
+#### 使用 Channel
+
+Channel 类似于传统的流对象，但与之有两个主要区别：
+
+*  Channel 可以直接将指定文件的部分或全部直接映射成 Buffer。
+* 程序不能直接访问 Channel 中数据，只能通过 Buffer 交互。
+
+所有 Channel 都不应该通过构造器来直接创建，而是通过传统的节点 InputStream、OutputStream 的 getCannel() 方法来返回对应的 Channel，不同的额节点流获得的 Channel 不一样。
+
+#### 字符集和 Charset
+
+计算机在将二进制字节序列与明文的字符序列互相转化时涉及到两个概念：编码（encode）和解码（decode）。通常而言，把明文的字符序列转换成计算机理解的二进制序列的操作称为编码，把二进制序列转换成铭文序列的造作称为解码。
+
+Java 默认使用 Unicode 字符集，但很多操作系统并不使用 Unicode 字符集，那么当 Java 程序与系统交换数据时，就可能出现乱码问题。
+
+Java 提供了 Charset 来处理字节序列和字符序列之间的转换关系，该类包含了用于创建解码器和编码器的方法，还提供获取 Charset 所支持字符集的方法，Charset 类是不可变的。
+
+每一个字符集都有一个字符串名称，也被称为字符串别名。对于中国的程序员而言，下面几个字符串别名是常用的。
+
+* GBK：简体中文字符集
+* BIG5：繁体中文字符集
+* ISO-8859-1：ISO 拉丁字母表 No.1，也叫做 ISO-LATIN-1
+* UTF-8：8为 UCS 转换格式
+* UTF-16BE：16位 UCS 转换格式，Big-endian（最低地址存放高位字节）字节顺序
+* UTF-16LE：16位 UCS 转换格式，Little-endian（最低地址存放低位字节）字节顺序
+* UTF-16：16位 UCS 转换格式，字节顺序由可选的字节顺序标记来标识
+
+Java7 新增了一个 StandardCharsets 类，该类包含的类变量代表了最常用字符集对应的 Charset 对象。
+
+#### 文件锁
+
+在 NIO 中，Java 提供了 FileLock 来支持文件锁定功能，在 FileChannel 中提供的 lock()/tryLock() 方法可以获得文件锁 FileLock 对象，从而锁定文件。lock() 试图锁定文件，无法得到文件锁时，程序阻塞；tryLock() 试图锁定文件，无法得到文件锁时，直接返回 null。
+
+文件锁可分共享锁和排他锁，共享锁允许多个进程读文件，但阻止其他程序获取该文件的排他锁。
+
+### NIO.2
+
+Java7 对原有的 NIO 进行了重大改进，主要包含如下两方面：
+
+* 提供了全面的文件 IO 和文件系统访问支持。
+* 基于异步 Channel 的 IO。
+
+#### Path、Paths 和 Files
+
+早期的 Java 只提供了 File 类来访问文件系统。File 类功能有限，不能利用特定文件系统的特性，File 所提供的方法的性能也不高，而且 File 的大多数方法出错时仅返回失败，不会提供异常信息。
+
+为了弥补这种不足，NIO.2 引入了一个 Path 接口，Path 接口代表一个平台无关的平台路径。除此之外，NIO.2 还提供了 Files、Paths 两个工具类，Files 包含了大量静态的工具方法来操作文件，例如便利文件和目录、监控文件变化、访问文件属性等；Paths 包含了两个返回 Path 的静态工厂方法。
+
