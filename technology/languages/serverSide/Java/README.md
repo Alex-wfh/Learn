@@ -3602,3 +3602,351 @@ call() 方法并不直接调用，它是被线程执行体调用的，所以需�
 
 不要对处于死亡状态的线程调用 start() 方法，否则会引发 IllegalThreadStateException。
 
+### 控制线程
+
+Java 的线程支持提供了一些便捷的工具方法，通过这些工具方法可以很好地控制线程的执行。
+
+#### join 线程
+
+join() 方法是 Thread 提供的让一个线程等待另一个线程完成的方法，当某个程序执行流中调用其他线程的 join() 方法时，调用线程将被阻塞，知道被 join() 方法加入的线程执行完为止。
+
+join() 方法通常由使用线程的程序调用，以将大问题划分成许多小问题，每个小问题分配一个线程，当所有小问题都得到处理后，再调用主线程来进一步操作。
+
+#### 后台线程
+
+后台线程（Daemon Thread）又称“守护线程”或“精灵线程”，是一种在后台运行的，为其他线程提供服务的线程。JVM 的垃圾回收线程就是典型的后台线程。
+
+如果所有前台线程都死亡，后台线程会自动死亡。
+
+将某个线程设置为后台线程的操作必须在该线程启动之前执行，也就是说 setDaemon(true) 必须在 start() 之前调用。
+
+#### 线程睡眠：sleep
+
+Thread 的 sleep() 方法用来让当前正在执行的线程暂停一段时间，并进入阻塞状态。
+
+调用 sleep() 方法进入阻塞状态后，在其睡眠时间内，该线程不会获得执行机会，即是系统中没有其它可执行的线程，处于 sleep() 中的线程也不会执行，因此 sleep() 方法常用来暂停程序的执行。
+
+Thread 还提供了一个与 sleep 方法有点类似的 yield() 静态方法，它可以让当前正在执行的线程暂停，但不会阻塞该线程，只是让线程转入就绪状态。yield() 只是让当前线程暂停一下，让系统的程序调度器重新调度一次。实际上，当某个线程调用了 yield() 方法暂停之后，只有优先级高于或等于当前线程的处于就绪状态的线程才能获得执行机会。
+
+##### sleep() 方法与 yield() 方法的区别如下：
+
+* 使用 sleep() 后，所有线程会获得执行机会，使用 yield() 后，只有线程自己，以及优先级高于或等于该线程的线程有执行机会。
+* sleep() 方法会将线程转入阻塞状态，知道经过阻塞时间后才会转入就绪状态，yield() 方法会将线程直接转入就绪状态。yield() 方法可以近似理解为 sleep(0)。
+* sleep() 方法声明抛出了 InterruptedException 异常，所以调用时需要处理该异常，yield() 方法没有声明抛出任何异常。
+* sleep() 方法比 yield() 方法有更好的可移植性，通常不建议调用 yield() 方法来控制并发线程的执行。
+
+#### 改变线程优先级
+
+每个线程执行时都具有一定的优先级，优先级高的线程获得较多执行机会，低的线程获得较少执行机会。
+
+每个线程默认获得其父线程的优先级，在默认情况下，main 线程具有普通优先级。
+
+Thread 类提供了 setPriority(int newPriority)、getPriority() 方法来设置和返回指定线程的优先级。优先级取值范围是1～10之间的整数。Thread 类提供了如下三个静态常量：MAX_PRIORITY(10)、MIN_PRIORITY(1)、NORM_PRIORITY(5)。某些操作系统并没有提供10个优先级等级，所以尽量使用静态常量来保证程序的可移植性。
+
+### 线程同步
+
+多线程编程是有趣的事情，它很容易突然出现“错误情况”，这是由系统的线程调度具有一定的随机性造成的，不过即使程序偶然出现问题，那也是由于编程不当引起的。当使用多个线程来访问同一个数据时，很容易出现线程安全问题。
+
+#### 同步代码块
+
+run() 方法的方法体不具有同步安全性，所以多个并发线程在修改同一个对象时可能出现线程安全问题。
+
+为了解决这个问题，Java 的多线程支持引入了同步监视器来解决这个问题，使用同步监视器的通用方法就是同步代码块，同步代码块是定义在 run() 方法中的代码块，其语法格式如下：
+
+```java
+Synchronized(obj){
+	...
+	// 此处的代码就是同步代码块
+}
+```
+
+任何时刻只能有一个线程可以获得对同步监视器的锁定，当同步代码执行完成后，该线程会释放对该同步监视器的锁定。
+
+#### 同步方法
+
+与同步代码块对于，Java 的多线程安全支持还提供了同步方法，同步方法就是使用 synchronized 关键字来修饰某个方法，则该方法称为同步方法。对于 synchronized 修饰的实例方法，无须显式制定同步监视器，同步方法的同步监视器是 this，也就是调用该方法的对象。
+
+通过使用同步方法可以非常安全地实现线程安全的类，线程安全的类具有如下特征：
+
+* 该类的对象可以被多个线程安全地访问。
+* 每个线程调用该对象的任意方法之后都将得到正确结果。
+* 每个线程调用该对象的任意方法之后，该对象的状态依然保持合理状态。
+
+synchronized 关键字可以修饰方法，可以修饰代码块，但不能修饰构造器、成员变量等。
+
+可变类的线程安全是以降低程序的运行效率为代价的，为了减少线程安全所带来的负面影响，程序可以采用如下策略。
+
+* 不要对线程安全类的所有方法都进行同步，只对那些会改变竞争资源（共享资源）的方法进行同步。
+* 如果可变类既要在单线程环境运行，又要在多线程环境运行，应针对不同环境提供不同版本，单线程版本保证性能，多线程版本保证线程安全。
+
+#### 释放同步监视器的锁定
+
+任何线程进入同步代码块、同步方法之前，必须先获得对同步监视器的锁定，那么何时会释放对同步监视器的锁定能？程序无法显式释放，线程会在如下几种情况下释放对同步监视器的锁定。
+
+* 当前线程的同步方法、同步代码块执行结束。
+* 当前线程在同步代码块、同步方法中遇到 break、return 终止了该代码块、方法。
+* 当前线程在同步代码块、同步方法中出现了未处理的 Error 或 Exception，导致该代码块、方法异常结束。
+* 当前线程在同步代码块、同步方法中执行了同步监视器对象的 wait() 方法，当前线程暂停。
+
+在如下所示情况下，线程不会释放同步监视器。
+
+* 当前线程在同步代码块、同步方法中调用 Thread.sleep()、Thread.yield() 方法来暂停当前线程的执行。
+* 线程执行同步代码块时、同步方法时，其它线程调用了该线程的 suspend() 方法将该线程挂起。此时就可能出现死锁。
+
+#### 同步锁（Lock）
+
+从 Java5 开始，Java 提供了一种更强大的线程同步机制——通过显示定义同步锁对象来实现同步，在这种机制下，同步锁由 Lock 对象充当。
+
+Lock 提供了比 Synchronized 方法和 synchronized 代码块更广泛的锁定操作，Lock 允许实现更灵活的结构，可以具有差别很大的属性，并且支持多个相关的 Condition 对象。
+
+Lock 是控制多个线程对共享资源进行访问的工具。通常，锁提供了对共享资源的独占访问，每次只能有一个线程对 Lock 对象加锁，线程开始访问共享资源之前应该先获得 Lock 对象。
+
+同步方法或同步代码块使用与竞争资源相关的、隐式的同步监视器，并且强制要求加锁和释放锁要出现在一个块结构中，并且当获取了多个锁时，它们必须以相反的顺序释放，且必须在所有的锁被获取时相同的范围内释放所有锁。
+
+虽然同步方法和同步代码块的范围机制使得多线程安全编程非常方便，而且还可以避免很多涉及锁的常见编程错误，但有时也需要以灵活的方式使用锁。Lock 提供了同步方法和同步代码块所没有的其他功能，包括用于非块结构的 tryLock() 方法，以及试图获取可中断锁的 lockInterruptibly() 方法，还有获取超时失效锁的 tryLock(long, TimeUnit) 方法。
+
+#### 死锁
+
+当两个线程相互等待对方释放同步监视器时就会发生死锁，Java 虚拟机没有监测，也没有采取措施来处理死锁情况，所以多线程编程时应采取措施避免死锁出现。一旦出现死锁，整个程序即不会发生任何异常，也不会给出任何  提示，只是所有线程处于阻塞状态，无法继续。
+
+由于 Thread 类的 suspend() 方法也很容易导致死锁，所以 Java 不推荐使用该方法来暂停线程的执行。
+
+### 线程通信
+
+当线程在系统内运行时，线程的调度具有一定的透明性，程序通常无法准确控制线程的轮换执行，但 Java 也提供了一些机制来保证线程协调运行。
+
+线程通信是保证线程协调运行的方式。
+
+#### 传统的线程通信
+
+Object 类提供的 wait()、notify()和 notifyAll() 三个方法用来 线程通信，这三个方法必须由同步监视器对象来调用，可分以下两种调用情况：
+
+* 对于使用 synchronized 修饰的同步方法，因为该类默认实例（this）就是同步监视器，所以可以在同步方法中直接调用这三个方法。
+* 对于使用 Synchronized 修饰的同步代码块，同步监视器是 Synchronized 后括号里的对象，所以必须使用该对象调用这三个方法。
+
+这三个方法作用如下：
+
+* wait()：当前线程等待，知道其他线程调用该同步监视器的 notify() 方法或 notifyAll() 方法来唤醒该线程。
+* notify()：唤醒在此同步监视器上等待的一个线程，如果有多个线程都在此同步监视器上等待，则随机唤醒其中一个。
+* notifyAll()：唤醒在此同步监视器上等待的所有线程。
+
+#### 使用 Condition 控制线程通信
+
+当使用 Lock 对象来保证同步时，Java 提供了一个 Condition 类来保持协调，使用 Condition 可以让那些已经得到 Lock 对象却无法继续执行的线程释放 Lock 对象，Condition 对象也可以唤醒其他处于等待的线程。
+
+Condition 将同步监视器方法（wait()、notify() 和 notifyAll()）分解成截然不同的对象，以便通过将这些对象与 Lock 对象组合使用，为每个对象提供多个等待集（wait-set）。咋这种情况下，Lock 替代了同步方法或同步代码块，Condition 替代了同步监视器的功能。
+
+Condition 实例被绑定在一个 Lock 对象上。要获得特点 Lock 实例的 Condition 实例，调用 Lock 对象的 newCondition() 方法即可。Condition 类提供如下三个方法。
+
+* await()：类似于隐式同步监视器上的 wait() 方法，导致当前线程等待，直到其他线程调用该 Condition 的 signal() 方法或 signalAll() 方法来唤醒该线程。
+* signal()：类似于隐式同步监视器上的 notify() 方法，唤醒在此 Lock 对象上等待的随机一个线程。
+* signalAll()：类似于隐式同步监视器上的 notifyAll() 方法，唤醒在此 Lock 对象上等待的全部线程。
+
+#### 使用阻塞队列（BlockingQueue）来控制线程通信
+
+Java5 提供了一个 BlockingQueue 接口，虽然 BlockingQueue 也是 Queue 的子接口，但它的主要用途并不是作为容器，而是作为线程同步工具。BlockQueue 具有一个特征：当生产者试图向 BlockQueue 中放入元素时，如果队列已满，则线程被阻塞；如果消费者试图从 BlockQueue 中取出元素时，如果队列已空，则该线程被阻塞。
+
+### 线程组和未处理的异常
+
+Java 使用 ThreadGroup 来表示线程组，它可以对一批线程进行分类管理（设置优先级、处理异常等），Java 允许程序直接对线程组进行控制。默认情况下，子线程和创建它的父线程处于同一个线程组内。一旦某个线程加入了指定线程组之后，该线程将一直属于该线程组，直到线程死亡，线程运行中途不能改变它所属的线程组。
+
+### 线程池
+
+系统启动一个新线程的成是会比较高的，因为它涉及与操作系统交互。在这种情况下，使用线程池可以很好地提高性能，尤其当程序中需要创建大量生存期很短暂的线程时。
+
+线程池可以有效地控制系统中并发的线程数量，当系统中包含大量并发线程时，会导致系统性能急剧下降，甚至导致 JVM 崩溃，而线程池的最大线程数参数可以控制系统中并发线程数不超过此数。
+
+在 Java5 以前，开发者必须手动实现自己的线程池；从 Java5 开始，Java 内建支持线程池，Java5 新增了一个 Executors 工厂类开产生线程池。Java7 提供了 ForkJoinPool 来支持将一个任务拆分成多个“小任务”并进行计算，再把多个“小任务“的结果合并成总的计算结果。Java8 在线程支持上增加了多 CPU 并行的能力。
+
+使用线程池执行线程任务的步骤如下：
+
+1. 调用 Executors 类的静态工厂方法创建一个 ExecutorService 对象，该对象代表一个线程池。
+2. 创建 Runnable 或 Callable 实现类的实例，作为线程执行任务。
+3. 调用 ExecutorService 对象的 submit() 方法来提交 Runnable 或 Callable 实例。
+4. 当不想提交任何任务时，调用 ExecutorService 对象的 shutdown() 方法来关闭线程池。
+
+### 线程相关类
+
+#### ThreadLocal 类
+
+ThreadLocal，是 Thread Local Variable（线程局部变量）的意思，ThreadLocal 的功能非常简单，就是为每一个使用该变量的线程都提供一个变量值的副本，是每一个线程都可以独立改变自己的副本，而不会和其它线程的副本冲突。从编程的角度看，就好像每一个线程都完全拥有该变量一样。
+
+```java
+private ThreadLocal<String> name = new ThreadLocal<>();
+```
+
+ThreadLocal 只提供了 get、set 和 remove 方法。
+
+#### 包装线程不安全的集合
+
+之前介绍的集合都是线程不安全的，使用 Collections 提供的类方法把这些集合包装成线程安全的集合。
+
+```java
+// 使用 Collections 将一个普通的 HashMap 包装成线程安全的类
+HashMap m = Collections.synchronizedMap(new HashMap());
+```
+
+#### 线程安全的集合类
+
+Java5 开始，在 java.concurrent 包下提供了大量支持高效并发访问的集合接口和实现类。
+
+#### Java9 新增的发布-订阅框架
+
+Java9 新增了一个发布-订阅框架，该框架是基于异步相应流的，它可以非常方便地处理异步线程之间的流数据交换。而且这个发布-订阅框架不需要使用数据中心来缓冲数据，同时具有非常高效的性能。
+
+## 网络编程
+
+### Java 的基本网络支持
+
+Java 为网络支持提供了 java.net 包，该包下的 URL 和 URLConnection 等类提供了以编程方式访问 Web 服务的功能，URLDecoder 和 URLEncoder 则提供了普通字符串和 application/x-www-form-urlencoded MIME 字符串相互转换的静态方法。
+
+#### InetAddress
+
+Java 提供了 InerAddress 类来代表 IP 地址，InetAddress 下有两个子类：Inet4Address、Inet6Address，它们分别代表 IPv4（Internet Protocol version 4）和 IPv6（Internet Protocol version 6）地址。
+
+InetAddress 类本身并没有提供太多功能，它代表一个 IP 地址对象，是网络通信的基础。
+
+#### URLDecoder 和 URLEncoder
+
+URLDecoder 和 URLEncoder 用于完成普通字符串和 application/x-www-form-urlencoded MIME 字符串之间的相互转换。
+
+当 URL 地址里包含非西欧字符的字符串时，系统将会将这些非西欧字符串转换成特殊字符串。编程过程中可能涉及普通字符串和这种特殊字符串的相互转换，就需要使用 URLDecoder 和 URLEncoder 类。
+
+#### URL、URLConnection 和 URLPermission
+
+URL（Uniform Resource Locator）对象代表统一资源定位器，它是指向互联网“资源”的指针。资源可以是简单的文件或目录，也可以是对更为复杂对象的引用，例如数据库或搜索引擎的查询。通常情况下，URL 可以由协议名、主机、端口和资源组成，即满足如下格式：
+
+```
+protocol://host:port/resourceName
+```
+
+URLConnection 对象表示应用程序和 URL 之间的通信连接，HttpURLConnection 对象表示应用程序与 URL 之间的 HTTP 连接。程序可以通过 URLConnection 实例向该 URL 发送请求、读取 URL 引用的资源。
+
+Java8 新增了一个 URLPermission 工具类，用于管理 HttpURLConnection 的权限问题，如果在 HttpURLConnection 安装了安全管理器，通过该对象打开连接时就需要先获得权限。
+
+### 基于 TCP 协议的网络编程
+
+Java 对基于 TCP 协议的网络通信提供了良好的封装，使用 Socket 对象来代表两端的通信端口，从而在端口之间形成虚拟的网络链路，并通过 Socket 产生 IO 流来进行网络通信。
+
+#### 使用 ServerSocket 创建 TCP 服务端
+
+Java 中能接收其他通信实体连接请求的类是 ServerSocket，ServerSocket 对象用于监听来自客户端的 Socket 连接，如果没有连接，它将一直处于等待状态。
+
+#### 使用 Socket 进行通信
+
+客户端通常可以使用 Socket 的构造器来连接到指定服务器。
+
+当客户端、服务端产生了对于的 Socket 后，就得到了一条虚拟的网络通信链路，程序无需再区客户端、服务端，而是通过各自的 Socket 进行通信。
+
+#### 加入多线程
+
+使用传统的 BufferedReader 的 readLine() 方法读取数据时，在该方法成功返回之前，线程被阻塞，程序无法继续执行。因此，服务端应该为每个 Socket 单独启动一个线程，每个线程负责与一个客户端进行通信。
+
+客户端读取服务端数据的线程同样会被阻塞，所以系统应该单独启动一个线程，专门负责读取服务端数据。
+
+#### 半关闭的 Socket
+
+介绍 IO 时提到，如果要表示输出已结束，可以通过关闭输出流来实现。但在网络通信中不能用此方式实现，因为关闭输出流时，该输出流对应的 Socket 也将随之关闭，这样导致程序无法再从该 Socket 输入流中读取数据了。这种情况下，Socket 提供了两个半关闭的方法（shutdownInput()、shutdownOutput()），只关闭 Socket 的输入流或输出流，用以表示输出数据已经发送完成。
+
+即使同一个 Socket 实例先后调用 shutdownInput()、shutdownOutput() 方法，该 Socket 实例依然没有被关闭，只是 Socket 既不能输出数据，也不能输入数据。
+
+当调用 Socket 的 shutdownOutput() 或 shutdownInput() 方法关闭了输入流或输出流之后，该 Socket 无法再次打开输入流或输出流，因此这种做法通常不适合保持持久通信状态的交互式应用，只适合用于一站式的通信协议。
+
+####  使用 NIO 实现非阻塞 Socket 通信
+
+前面介绍的网络通信是基于阻塞式 API 的，即当程序执行输入、输出操作后，这些操作返回之前会一直阻塞该线程，所以服务端必须为每个客户端都提供一个独立线程进行处理，当服务端需要同时处理大量客户端时，这种做法会导致性能下降。
+
+使用 NIO API 可以让服务端使用一个或有限几个线程来同时处理连接到服务端的所有客户端。
+
+Java 的 NIO 为非阻塞式 Socket 通信提供了如下特殊类。
+
+* Selector，它是 SelectableChannel 对象的多路复用器，所有希望采用非阻塞方式进行通信的 Channel 都应该注册到 Selector 对象。可以通过调用此类的 open() 静态方法来创建 Selector 实例，该方法将使用系统默认的 Selector 来返回新的 Selector。Selector 可以同时监控多个 SelectableChannel 的 IO 状况，是非阻塞 IO 的核心。一个 Selector 实例有三个 SelectionKey 集合：所有的、被选择的、被取消的。
+* SelectableChannel，它代表可以支持非阻塞 IO 操作的 Channel 对象，它可以被注册到 Selector 上，这种注册关系由 SelectionKey 实例表示。Selector 对象提供了一个 select() 方法，该方法允许程序同时监控多个 IO Channel。
+
+应用程序可调用 SelectableChannel 的 register() 方法将其注册到 Selector 上，当 Selector 上的某些 SelectableChannel 需要处理 IO 操作时，程序可以调用 Selector 实例的 select() 方法获取它们的数量，并通过 selectedKeys() 方法返回它们对应的 SelectionKey 集合，通过集合就可以获得所有需要进行 IO 处理的 SelectabelChannel 集。
+
+SelectableChannel 对象支持阻塞和非阻塞两种模式（所有 Channel 默认都是阻塞模式），必须使用非阻塞模式才可以利用非阻塞 IO 操作。
+
+```java
+// 用于监测所有 Channel 状态的 Selector
+Selector selector = null;
+selector = selector.open();
+// 通过 open 方法打开一个未绑定的 ServerSocketChannel 实例
+ServerSocketChannel server = ServersocketChannel.open();
+InetSocketAddress isa = new InetSocketAddress("127.0.0.1", 30000);
+// 将该 ServerSocketChannel 绑定到指定 IP 地址
+server.bind(isa);
+// 设置 ServerSocket 以非阻塞方式工作
+server.configureBlocking(false);
+// 将 server 注册到指定的 Selector 对象
+server.register(selector, SelectionKey.OP_ACCEPT);
+// 如果 SelectableChannel 有需要处理的 IO 操作
+while (selector.select()>0){
+  // 依次处理 selector 上的每个已选择的 SelectionKey
+  for (SelectionKey sk : selector.selectedKeys){
+    // 从 selector 上的已选择 key 集中删除正在处理的 SelectionKey
+    selector.selectedKeys().remove(sk);
+    // 执行网络请求操作
+    ...
+  }
+}
+```
+
+#### 使用 Java7 的 AIO 实现非阻塞通信
+
+Java7 的 NIO.2 提供了异步 Channel 支持，这种异步 Channel 可以提供更高效的 IO，这种基于异步 Channel 的 IO 机制也被称为异步 IO（AIO，Asynchronous IO）
+
+##### 同步、异步、阻塞、非阻塞
+
+如果按 POSIX 的标准来划分 IO，可以吧 IO 分为两类：同步 IO 和异步 IO。对于 IO 操作可以分成两步：1. 程序发出 IO 请求；2. 完成实际的 IO 操作。前面两节介绍的阻塞 IO、非阻塞 IO 都是针对第一步来划分的，如果发出 IO 请求会阻塞线程，就是阻塞 IO，如果不阻塞线程，就是非阻塞 IO；同步与异步的区别在第二步，如果实际的 IO 操作由操作系统完成，再将结果返回给应用程序，就是异步 IO，如果实际的 IO 需要 应用程序本身去执行，会阻塞线程，就是同步 IO。前面介绍的传统 IO、基于 Channel 的非阻塞 IO 其实都是同步 IO。
+
+NIO.2 提供了一系列以 Asynchronous 开头的 Channel 接口和类，其中 AsynchronousSocketChannel、AsynchronousServerSocketChannel 是支持 TCP 通信的异步 Channel。
+
+AsynchronousServerSocketChannel 是一个负责监听 Channel，与 ServerSocketChannel 相似，使用  AsynchronousServerSocketChannel 需要如下三步：
+
+1. 调用它的 open() 方法创建一个未监听端口的 AsynchronousServerSocketChannel。
+2. 调用 AsynchronousServerSocketChannel 的 bind() 方法指定地址、端口监听。
+3. 调用 AsynchronousServerSocketChannel 的 accept() 方法接受连接请求。
+
+```java
+try(
+	// 1. 创建 AsynchronousServerSocketChannel 对象
+	AsynchronousServerSocketChannel serverChannel = AsynchronousServerSocketChannel.open()
+){
+	// 2. 指定地址、端口监听
+	serverChannel.bind(new InetSocketAddress(PORT));
+	while (true){
+    // 3. 采用循环接受来自客户端的连接
+    Future<AsunchronousSocketChannel> future = serverChannel.accept();
+    // 获取连接完成后返回 AsynchronousSocketChannel
+    AsynchronousSocketChannel socketChannel = future.get();
+    // 执行输出
+    socketChannel.write(ByteBuffer.wrap("Hi！".getBytes("UTF-8"))).get();
+  }
+}
+```
+
+AsynchronousSocketChannel 的用法也可分为三步：
+
+1. 调用 open() 静态方法创建 AsynchronousSocketChannel。
+2. 调用 AsynchronousSocketChannel 的 connect 方法连接到指定 IP 地址、端口的服务器。
+3. 调用 AsynchronousSocketChannel 的 read()、write() 方法进行读写。
+
+```java
+// 用于读取数据的 ByteBuffer
+ByteBuffer buff = ByteBuffer.allocate(1024);
+try(
+	// 1. 创建 AsynchronousSocketChannel 对象
+	AsynchronousSocketChannel clientChannel = AsynchronousSocketChannel.open();
+){
+	// 2. 连接远程服务器
+	clientChannel.connect(new InetSocketAddress("127.0.0.1", PORT)).get();
+	buff.clear();
+	// 3. 从 clientChannel 中读取数据
+	clientChannel.read(buff).get();
+	buff.flip();
+	// 将 buff 中内容转换为字符串
+	String content - utf.decode(buff).toString();
+}
+```
+
