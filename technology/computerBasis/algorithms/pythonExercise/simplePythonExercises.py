@@ -1292,8 +1292,35 @@ def exercise100():
     l = ['b', 2]
     print( dict([i,l]) )
 
+"""
+题目101：列表全排列（所有可能的组合）
+"""
+def exercise101_1():
+    seq = input('please input a stringe:\n')
+    def permute1(seq):
+        if not seq:
+            return [seq]
+        else:
+            res = []
+            for i in range(len(seq)):
+                rest = seq[:i] + seq[i+1:]
+                for x in permute1(rest):
+                    res.append(seq[i:i+1] + x)
+            return res
+    print( permute1(seq) )
 
-
+def exercise101_2():
+    seq = input('please input a stringe:\n')
+    def permute1(seq):
+        if not seq:
+            yield seq
+        else:
+            res = []
+            for i in range(len(seq)):
+                rest = seq[:i] + seq[i+1:]
+                for x in permute1(rest):
+                    yield (seq[i:i+1] + x)
+    print( list(permute1(seq)) )
 
 
 """
