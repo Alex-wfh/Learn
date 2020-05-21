@@ -1296,7 +1296,7 @@ def exercise100():
 题目101：列表全排列（所有可能的组合）
 """
 def exercise101_1():
-    seq = input('please input a stringe:\n')
+    seq = input('please input a string:\n')
     def permute1(seq):
         if not seq:
             return [seq]
@@ -1310,7 +1310,7 @@ def exercise101_1():
     print( permute1(seq) )
 
 def exercise101_2():
-    seq = input('please input a stringe:\n')
+    seq = input('please input a string:\n')
     def permute1(seq):
         if not seq:
             yield seq

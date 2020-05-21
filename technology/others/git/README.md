@@ -2,7 +2,7 @@
 
 * git rebase    直接覆盖的merge
 
-* git rebase -i    修改提交
+* git rebase -i    交互式变基
 
   * reward    修改提交信息
   * edit    修改此提交
@@ -36,4 +36,5 @@
 * git add
 * git commit 
 * git push
-
+* git diff
+* git stash
