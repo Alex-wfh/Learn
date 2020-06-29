@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from doFunc import doFunc
+
 def func1():
-    """
+    '''
     多重赋值
-    """
+    '''
     a, *b, c = 1,2,3,4,5,6
     print(a,b,c)
 
 def func2():
-    """
+    '''
     队列
-    """
+    '''
     from collections import deque
     q = deque(maxlen=2)
     q.append(1)
@@ -21,9 +23,9 @@ def func2():
     print(q)
 
 def func3():
-    """
+    '''
     最大或最小的n个元素
-    """
+    '''
     import heapq
     nums = [1,2,4,21,6,94,3,-12,5,-67,-45,-67]
     print(heapq.nlargest(3,nums))
@@ -41,9 +43,9 @@ def func3():
     print(heapq.heappop(nums))
 
 def func4():
-    """
+    '''
     优先级队列
-    """
+    '''
     import heapq
     class PriorityQueue:
         def __init__(self):
@@ -81,9 +83,9 @@ def func4():
     print(heapq.heappop(_queue))
 
 def func5():
-    """
+    '''
     字典中将键映射到多个值上
-    """
+    '''
     from collections import defaultdict
     d = defaultdict(list)
     d['a'].append(1)
@@ -98,9 +100,9 @@ def func5():
     print(d)
 
 def func6():
-    """
+    '''
     有序字典
-    """
+    '''
     from collections import OrderedDict
     d = OrderedDict()
     d['d'] = 4
@@ -112,9 +114,9 @@ def func6():
     print(json.dumps(d))
 
 def func7():
-    """
+    '''
     字典相关计算
-    """
+    '''
     d = {'a':1,'b':2}
     print(d.keys())
     print(d.values())
@@ -127,9 +129,9 @@ def func7():
     print(dict(z))
 
 def func8():
-    """
+    '''
     对切片命名
-    """
+    '''
     s = slice(1,10,2)
     print(s.start)
     print(s.stop)
@@ -138,10 +140,10 @@ def func8():
     print(s.indices(15))
 
 def func9():
-    """
+    '''
     找出序列中出现次数最多的元素
     对数据制表或计数时
-    """
+    '''
     from collections import Counter
     words = ['a', 'c', 'b', 'a', 'd', 'e', 'f', 'v', 'b', 'a', 'e', 'c']
     word_counts = Counter(words)
@@ -149,9 +151,9 @@ def func9():
     print(top_three)
 
 def func10():
-    """
+    '''
     通过公共键对字典列表排序
-    """
+    '''
     prices = [
         {'name':'a', 'price':1.0},
         {'name':'b', 'price':2.0},
@@ -168,9 +170,9 @@ def func10():
     print(prices_by_price2)
 
 def func11():
-    """
+    '''
     对不原生支持比较操作的对象排序排序
-    """
+    '''
     class price:
         def __init__(self, name, price):
             self.name = name
@@ -193,9 +195,9 @@ def func11():
     print(prices_by_price2)
 
 def func12():
-    """
+    '''
     根据字段将记录分组
-    """
+    '''
     from operator import itemgetter
     from itertools import groupby
     prices = [
@@ -212,9 +214,9 @@ def func12():
             print(' ', i)
 
 def func13():
-    """
+    '''
     list中筛选元素
-    """
+    '''
     values = [1,2,-1,0,12,5,-11]
     ivals = list(filter(lambda v:v>0, values))
     print(ivals)    
@@ -224,9 +226,9 @@ def func13():
     print(ivals)    
 
 def func14():
-    """
+    '''
     名称映射到序列元组中
-    """
+    '''
     from collections import namedtuple
     price = namedtuple('price', ['name', 'price'])
     p = price('a', 1.0)
@@ -235,9 +237,9 @@ def func14():
     print(p.price)
 
 def func15():
-    """
+    '''
     将多个映射合并为单个映射
-    """
+    '''
     from collections import ChainMap
     a = {'a': 1, 'b':2}
     b = {'c': 3, 'b':4}
@@ -249,4 +251,4 @@ def func15():
 
 
 if __name__ == "__main__":
-    func15()
+    doFunc()
