@@ -10,7 +10,8 @@ def doFunc(func_name=None):
     print('function name: {}\ndoc: {}\ndo:'.format(func_name, func.__doc__))
     result = func()
     print('end')
-    print('result: {}'.format(result))
+    if result is not None:
+        print('result: {}'.format(result))
 
 def getLatestFuncName(main_file):
     names = [int(func[4:]) for func in main_file.keys() if func.startswith('func')]

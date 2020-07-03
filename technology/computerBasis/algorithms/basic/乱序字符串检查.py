@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #i -*- coding:utf-8 -*-
 
 # 两个字符串，判断第二个能否由第一个打乱生成

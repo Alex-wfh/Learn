@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # 构建一个由指定长度的子集组成的全部排列组合的列表，但是不考虑顺序
