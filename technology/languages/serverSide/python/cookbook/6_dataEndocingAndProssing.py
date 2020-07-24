@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# ! -*- coding:utf-8 -*-
+#! -*- coding:utf-8 -*-
 
 from doFunc import doFunc
 
@@ -104,7 +104,7 @@ def func2():
                 setattr(obj, k, v)
             return obj
         else:
-            return obj
+            return d
 
     p = Point(2, 3)
     s = json.dumps(p, default=serialize_instance)

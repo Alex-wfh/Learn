@@ -42,12 +42,12 @@ def func4():
     """
     文本模式的匹配和查找
     """
+    import re
     print(s.find('yeah'))
     print(s.startswith('y'))
     print(s.endswith('h'))
     print(re.match(r'.*but.*', s))
 
-    import re
     c = re.compile(r'.*but.*')
     print(c.match(s))
     m = c.match(s)

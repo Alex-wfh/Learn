@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# ! -*- coding:utf-8 -*-
+#! -*- coding:utf-8 -*-
 
 from doFunc import doFunc
 
@@ -1050,19 +1050,19 @@ def func19():
     class ConnectionState:
         @staticmethod
         def read(conn):
-            raise NoImplementedError()
+            raise NotImplementedError()
 
         @staticmethod
         def write(conn, data):
-            raise NoImplementedError()
+            raise NotImplementedError()
 
         @staticmethod
         def open(conn):
-            raise NoImplementedError()
+            raise NotImplementedError()
 
         @staticmethod
         def close(conn):
-            raise NoImplementedError()
+            raise NotImplementedError()
 
     class CloseConnectionState(ConnectionState):
         @staticmethod
@@ -1116,16 +1116,16 @@ def func19():
             self.__class__ = newstate
 
         def read(self):
-            raise NoImplementedError()
+            raise NotImplementedError()
 
         def write(self, data):
-            raise NoImplementedError()
+            raise NotImplementedError()
 
         def open(self):
-            raise NoImplementedError()
+            raise NotImplementedError()
 
         def close(self):
-            raise NoImplementedError()
+            raise NotImplementedError()
 
     class CloseConnectionState(Connection):
         def read(self):
@@ -1308,7 +1308,7 @@ def func22():
             return meth(node)
 
         def generic_visit(self, node):
-            raise RuntimeError('No {} method'.format('visit_' + type(nade).__name__))
+            raise RuntimeError('No {} method'.format('visit_' + type(node).__name__))
 
     class UnaryOperator(Node):
         def __init__(self, operand):
