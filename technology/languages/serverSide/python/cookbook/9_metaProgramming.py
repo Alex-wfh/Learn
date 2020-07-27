@@ -134,7 +134,9 @@ def func4():
             def wrapper(*args, **kwargs):
                 log.log(level, log_msg)
                 return func(*args, **kwargs)
+
             return wrapper
+
         return decorator
 
     @logged(logging.DEBUG)
@@ -196,6 +198,7 @@ def func5():
                 log_msg = new_msg
 
             return wrapper
+
         return decorator
 
     @logged(logging.DEBUG)
@@ -233,6 +236,7 @@ def func6():
         def wrapper(*args, **kwargs):
             log.log(level, log_msg)
             return func(*args, **kwargs)
+
         return wrapper
 
     @logged
@@ -275,7 +279,9 @@ def func7():
                         if not isinstance(value, bound_types[name]):
                             raise TypeError('Argument {} must be {}'.format(name, bound_types[name]))
                 return func(*args, **kwargs)
+
             return wrapper
+
         return decorate
 
     @type_assert(int, int)
@@ -294,6 +300,108 @@ def func7():
         spam(5, 'a', 'fck')
     except Exception as e:
         print(e)
+
+
+def func8():
+    """
+    在类中定义装饰器
+    首先要确定装饰器是以实例方法还是类方法形式应用
+    如果需要装饰器记录或合并信息，在类中定义装饰器就很适合
+    尽管在外层的装饰器函数中使用了self或cls参数，但内层定义的包装函数一般不需要额外的函数，唯一用到这个参数的场景就是需要在包装函数中访问实例的某个部分
+    这种定义方式在继承中也有潜在的用途，继承时，装饰器必须定义为类方法，而且使用时须显示地给出父类的名称，因为在定义该方法时，子类根本没有创建
+    """
+
+    from functools import wraps
+
+    class A:
+        def decorator1(self, func):
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                print('Decorator 1')
+                return func(*args, **kwargs)
+
+            return wrapper
+
+        @classmethod
+        def decorator2(cls, func):
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                print('Decorator 2')
+                return func(*args, **kwargs)
+
+            return wrapper
+
+    a = A()
+
+    @a.decorator1
+    def spam():
+        pass
+
+    @A.decorator2
+    def grok():
+        pass
+
+    class B(A):
+        @A.decorator2
+        def bar(self):
+            pass
+    spam()
+    grok()
+    b = B()
+    print('b.bar()')
+    b.bar()
+
+
+def func9():
+    """
+    把装饰器定义成类
+    用装饰器来包装函数，希望得到的结果是一个可调用的实例。装饰器既能在类中工作，也可以在类外部使用
+    要把装饰器定义成类，需要确保在类中实现__call__()和__get__()方法
+    把装饰器定义成类通常是简单明了的，需要注意以下几点：
+        1. 对functools.wraps()函数的使用和在普通装饰器中目的一样
+        2. __get__()方法不可忽视，如果省略会发现当尝试调用被装饰的实例方法时会出现怪异的行为
+    """
+    import types
+    from functools import wraps
+
+    class Profiled:
+        def __init__(self, func):
+            wraps(func)(self)
+            self.n_calls = 0
+
+        def __call__(self, *args, **kwargs):
+            self.n_calls += 1
+            return self.__wrapped__(*args, **kwargs)
+
+        def __get__(self, instance, cls):
+            if instance is None:
+                return self
+            else:
+                return types.MethodType(self, instance)
+
+    @Profiled
+    def add(x, y):
+        return x + y
+
+    class Spam:
+        @Profiled
+        def bar(self, x):
+            print(self, x)
+
+    print(add(2, 3), add(2, 3), add.n_calls)
+    s = Spam()
+    s.bar(1)
+    s.bar(2)
+    print(s.bar.n_calls)
+
+
+def func10():
+    """
+    装饰器作用到类和静态方法上
+    装饰器作用到类和静态方法上是简单而直接的，但是要保证装饰器在应用的时候需要放在@classmethod和@staticmethod之前
+    这里的问题在于@calssmethod和@staticmethod并不会实际创建可直接调用的对象。相反，它们创建的是特殊的描述符对象。
+    因此，如果尝试在另一个装饰器中想函数那样使用它们，装饰器就会崩溃。所以要确保这些装饰器出现在@classmethod和@staticmethod之前。
+    """
 
 
 if __name__ == '__main__':
