@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#! -*- coding:utf-8 -*-
+# ! -*- coding:utf-8 -*-
 
 from doFunc import doFunc
 
@@ -314,10 +314,10 @@ def func10():
     让属性具有惰性求值的能力
     定义一个惰性属性最有效的方法就是利用描述符来完成
     让属性具有惰性求值能力的全部意义就在于提升程序性能
-    lazyproperty类通过让__get__()方法以property属性相同的名称来保存计算出的值, 这么做会让值保存在实例字典中, 可以阻止该property属性重复进行计算
+    lazy_property类通过让__get__()方法以property属性相同的名称来保存计算出的值, 这么做会让值保存在实例字典中, 可以阻止该property属性重复进行计算
     """
 
-    class lazyproperty:
+    class lazy_property:
         def __init__(self, func):
             self.func = func
 
@@ -331,18 +331,19 @@ def func10():
 
     def test():
         import math
+
         class Circle:
             def __init__(self, radius):
                 self.radius = radius
 
-            @lazyproperty
+            @lazy_property
             def area(self):
-                print('Compution area')
+                print('Computing area')
                 return math.pi * self.radius ** 2
 
-            @lazyproperty
+            @lazy_property
             def perimeter(self):
-                print('Compution perimeter')
+                print('Computing perimeter')
                 return 2 * math.pi * self.radius
 
         c = Circle(4)
@@ -360,7 +361,7 @@ def func10():
     如果考虑可变性的问题, 可以使用另一种方式实现, 但执行效率会稍打折扣
     """
 
-    def lazyproperty(func):
+    def lazy_property(func):
         name = '_lazy_' + func.__name__
 
         @property
