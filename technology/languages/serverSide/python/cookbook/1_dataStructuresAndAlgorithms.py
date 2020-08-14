@@ -51,6 +51,7 @@ def func4():
     优先级队列
     """
     import heapq
+
     class PriorityQueue:
         def __init__(self):
             self._queue = []
@@ -189,7 +190,7 @@ def func11():
     对不原生支持比较操作的对象排序排序
     """
 
-    class price:
+    class Price:
         def __init__(self, name, price):
             self.name = name
             self.price = price
@@ -198,11 +199,11 @@ def func11():
             return 'price(name:{}, price:{})'.format(self.name, self.price)
 
     prices = [
-        price('a', 1.0),
-        price('b', 2.0),
-        price('c', 3.0),
-        price('d', 2.1),
-        price('e', 1.5)
+        Price('a', 1.0),
+        Price('b', 2.0),
+        Price('c', 3.0),
+        Price('d', 2.1),
+        Price('e', 1.5)
     ]
     from operator import attrgetter
     prices_by_name = sorted(prices, key=attrgetter('name'))
