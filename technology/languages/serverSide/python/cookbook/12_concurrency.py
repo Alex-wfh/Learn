@@ -680,7 +680,6 @@ def func8():
 
     concurrent.futures 库中提供了一个 ProcessPoolExecutor 类，可用来在单独运行的 Python 解释器实例中执行计算密集型的函数。
     尽管进程池使用起来很简单，但是在设计规模更大的程序时有几个重要的因素需要考虑。
-    `
     1. 多进程技术只适用于将问题分解成各个独立部分的情况。
     2. 任务必须定义成普通的函数来提交。实例方法、闭包或者其他类型的可调用对象都不支持并行处理。
     3. 函数的参数和返回值必须可兼容于 pickle 编码。因为需要进程间通信。
@@ -695,6 +694,7 @@ def func8():
     进程池会一直运行，直到 with 语句块中的最后一条语句执行完毕为止，此时进程池就会关闭。但程序会一直等待所有已经提交的任务都处理完毕为止。
     """
     from concurrent.futures import ProcessPoolExecutor
+
     with ProcessPoolExecutor() as pool:
         """
         do work in parallel using pool
@@ -707,15 +707,15 @@ def func8():
     使用 pool.map() 可以并行处理一个列表推导式或者 map() 操作。使用 pool.submit() 可以手动提交一个单独的任务。
     如果手动提交任务，得到的结果就是一个 Future 实例。要获取到实际的结果还需要调用它的 result() 方法。这么做会阻塞进程，直到完成类计算并将结果返回给进程池为止。
     """
+    global work # 注意：进程间通过 pickle 通信，而 pickle 只支持序列化包最上层的函数、类。所以需要将 work 函数定义为 golbal 的。
+
     def work(x):
         return x
 
-    results = map(work, 'data')
-
     with ProcessPoolExecutor() as pool:
-        results = pool.map(work, 'data')
-
-    print(results)
+        results = pool.map(work, range(10))
+        for result in results:
+            print(result)
 
     with ProcessPoolExecutor() as pool:
         future_result = pool.submit(work, 'data')
@@ -724,7 +724,327 @@ def func8():
 
     """
     与其让进程阻塞，也可以提供一个回调函数，让他在任务完成时得到触发执行。
-    用户提供的回调函数需要接受一个 Future 实例，必须用它才能获取到实际的结果。
+    用户提供的回调函数需要接受一个 Future 实例，必须用它才能获取到实际的结果（即调用它的 result() 方法）。
+    """
+    def when_done(r):
+        print('Got:', r.result())
+
+    with ProcessPoolExecutor() as pool:
+        future_result = pool.submit(work, 'data')
+        future_result.add_done_callback(when_done)
+
+
+def func9():
+    """
+    如何规避 GIL 带来的限制
+
+    尽管 Python 完全支持多线程编程，但是在解释器的 C 语言实现中，有一部分并不是线程安全的，因此不能完全支持并发执行。
+    事实上，解释器被一个称之为全局解释器锁(GIL)的东西保护着，在任意时刻只允许一个 Python 线程投入执行。
+    GIL 带来的最明显的影响就是多线程的 Python 程序无法充分利用多个 CPU 核心带来的优势。
+    即，一个采用多线程技术的计算密集型应用只能在一个 CPU 上运行。
+
+    要规避 GIL 的限制主要有两种常用的策略：
+    1. 使用 multiprocessing 模块来创建进程池，把它当做协处理器来使用。
+        需要涉及同另一个 Python 解释器之间进行数据序列化和通信处理。为了让这种方法奏效，代执行的操作需要包含在以 def 语句定义的 Python 函数中，且函数参数和返回值必须兼容于 pickle 编码。
+        此外，要完成的工作规模必须足够大时才能考虑使用 multiprocessing，这样可以弥补额外产生的通信开销。
+    2. 将计算密集型的任务转移到 C 语言中，使其独立于 Python，在 C 代码中释放 GIL。
+        确保 C 代码可以独立于 Python 执行。这意味着不适用 Python 的数据结构，也不调用 Python 的 C 语言 API。
+        同样，只有 C 语言扩展模块能够完成足够多的任务时才考虑此方案。
+    """
+
+
+def func10():
+    """
+    定义一个 Actor 任务
+
+    actor 优势：原理简单、可扩展。
+
+    actor 模式是最古老也是最简单的用来解决并发和分布式计算问题的方法之一。
+    actor 就是一个并发执行的任务，它只是简单地对发送给它的消息进行处理。
+    作为对这些消息的响应，actor 会决定是否要对其他的 actor 发送进一步的信息。
+    actor 任务之间的通信是单向且异步的。因此，消息的发送者并不知道消息何时才会实际传递，当消息已经处理完毕时也不会接收到响应或者确认。
+
+    actor 模式之所以吸引人，它的简单性是原因之一。在实践中只有 send() 一个核心操作。
+    此外，基于 actor 模式的系统中，"消息"的概念可以扩展到许多不同的方向。
+    """
+    from queue import Queue
+    from threading import Thread, Event
+
+    class ActorExit(Exception):
+        pass
+
+    class Actor:
+        def __init__(self):
+            self._mailbox = Queue()
+
+        def send(self, msg):
+            self._mailbox.put(msg)
+
+        def recv(self):
+            msg = self._mailbox.get()
+            if msg is ActorExit:
+                raise ActorExit()
+            return msg
+
+        def close(self):
+            self.send(ActorExit)
+
+        def start(self):
+            self._terminated = Event()
+            t = Thread(target=self._bootstrap)
+            t.daemon = True
+            t.start()
+
+        def _bootstrap(self):
+            try:
+                self.run()
+            except ActorExit:
+                pass
+            finally:
+                self._terminated.set()
+
+        def join(self):
+            self._terminated.wait()
+
+        def run(self):
+            while True:
+                msg = self.recv()
+
+    class PrintActor(Actor):
+        def run(self):
+            while True:
+                msg = self.recv()
+                print('Got:', msg)
+
+    p = PrintActor()
+    p.start()
+    p.send('Hello')
+    p.send('World')
+    p.close()
+    p.join()
+
+    """
+    去掉并发和异步消息传递，用生成器定义一个最简化的 actor 对象。
+    """
+    def print_actor():
+        while True:
+            try:
+                msg = yield
+                print('Got:', msg)
+            except GeneratorExit:
+                print('Actor terminating')
+
+    p = print_actor()
+    next(p)
+    p.send('Hello')
+    p.send('World')
+    p.close()
+
+
+def func11():
+    """
+    实现发布者/订阅者消息模式
+
+    一般来说需要引入一个单独的"交换"或者"网关"对象，作为所有消息的中介。
+    也就是说，不是直接将消息从一个任务发往另一个任务，而是将消息发往交换中介，由中介将消息转发给一个或多个相关联的任务。
+
+    交换中介其实就是一个对象，它保存了活跃的订阅者集合，并提供关联、取消关联以及发送消息的方法。每个交换中介都由一个名称来标识。
+
+    发布者/订阅者模型的好处：
+    1. 使用交换中介可以简化很多设定线程通信的工作。
+    2. 交换中介具有将消息广播发送给多个订阅者的能力。
+    3. 能和各种类似于任务的对象一起工作。
+
+    交换中介的思想可以有许多种可能的扩展。实现一整个消息通道的集合、对交换中介的名称加以模式匹配规则、扩展到分布式计算等。
+    """
+    from collections import defaultdict
+
+    class Exchange:
+        def __init__(self):
+            self._subscribers = set()
+
+        def attach(self, task):
+            self._subscribers.add(task)
+
+        def detach(self, task):
+            self._subscribers.remove(task)
+
+        def send(self, msg):
+            for subscriber in self._subscribers:
+                subscriber.send(msg)
+
+    _exchanges = defaultdict(Exchange)
+
+    def get_exchange(name):
+        return _exchanges[name]
+
+    class Task:
+        def __init__(self):
+            pass
+
+        def send(self, msg):
+            pass
+
+    task_a = Task()
+    task_b = Task()
+
+    # Example of getting an exchange
+    exc = get_exchange('name')
+
+    # Examples of subscribing tasks to it
+    exc.attach(task_a)
+    exc.attach(task_b)
+
+    # Example of sending messages
+    exc.send('msg1')
+    exc.send('msg2')
+
+    # Example of unsubscribing
+    exc.detach(task_a)
+    exc.detach(task_b)
+
+
+def func12():
+    """
+    使用生成器(协程，有时也称为用户级线程或绿色线程)作为线程的替代方案
+
+    优点：执行效率极高、不需要锁机制。
+    缺点：执行到阻塞(CPU密集型或者I/O阻塞型)代码会使整个任务调度器挂起，部分 Python 库不能很好地配合协程使用。
+
+    当构建基于生成器的并发框架时，使用一般形式的 yield 是最为常见的。以此形式使用 yield 的函数更常被称为"协程"。
+    """
+
+    def count_down(n):
+        while n > 0:
+            print('T-minus', n)
+            yield
+            n -= 1
+        print('Blastoff!')
+
+    def count_up(n):
+        x = 0
+        while x < n:
+            print('Counting up', x)
+            yield
+            x += 1
+
+    from collections import deque
+
+    class TaskScheduler:
+        def __init__(self):
+            self._task_queue = deque()
+
+        def new_task(self, task):
+            self._task_queue.append(task)
+
+        def run(self):
+            while self._task_queue:
+                task = self._task_queue.popleft()
+                try:
+                    next(task)
+                    self._task_queue.append(task)
+                except StopIteration:
+                    pass
+
+    # Example use
+    sched = TaskScheduler()
+    sched.new_task(count_down(10))
+    sched.new_task(count_down(5))
+    sched.new_task(count_up(15))
+    sched.run()
+
+
+def func13():
+    """
+    轮询多个线程队列
+
+    要对非文件类型的对象比如队列做轮询操作，可以遍历所有队列，分别判断队列是否为空，为避免 CPU 利用率过高还需要使用定时器。
+    这种方式很笨重，而且可能会出现性能问题。
+
+    通过把队列放在和 socket 同等的地位上，只要一个单独的 select() 调用就可以轮询这两种对象的活跃性。不需要使用超时或其他基于时间的技巧来做周期性的检查。
+    此外，如果数据添加到了队列中，消费者几乎能在同一时间得到通知。
+    以底层 I/O 的一点负载，换取更好的响应时间以及简化的代码编写，通常是很值得的。
+    """
+    import queue
+    import socket
+    import time
+
+    class PollableQueue(queue.Queue):
+        """
+        针对每个想要轮询的队列（或任何对象），创建一对互联的 socket。
+        然后对其中一个 socket 执行写操作，以表示数据存在。另一个 socket 就传递给 select() 或者类似的函数来轮询数据。
+        """
+        def __init__(self):
+            super().__init__()
+            self._put_socket, self._get_socket = socket.socketpair()
+            """
+            # 兼容不同操作系统
+            import os
+            if os.name == 'posix':
+                self._put_socket, self._get_socket = socket.socketpair()
+            else:
+                server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                server.bind(('127.0.0.1', 0))
+                server.listen(1)
+                self._put_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self._put_socket.connect(server.getsockname())
+                self._get_socket, _ = server.accept()
+                server.close()
+            """
+
+        def fileno(self):
+            return self._get_socket.fileno()
+
+        def put(self, item):
+            super().put(item)
+            self._put_socket.send(b'x')
+
+        def get(self):
+            self._get_socket.recv(1)
+            return super().get()
+
+    import select
+    import threading
+
+    def consumer(queues):
+        """
+        不管把数据放入哪个队列中，消费者最后都能接收到所有数据。
+        """
+        while True:
+            can_read, _, _ = select.select(queues, [], [])
+            for r in can_read:
+                item = r.get()
+                print('Got:', item)
+                if item == 'stop':
+                    return
+
+    q1 = PollableQueue()
+    q2 = PollableQueue()
+    q3 = PollableQueue()
+    t = threading.Thread(target=consumer, args=([q1, q2, q3],))
+    t.daemon = True
+    t.start()
+
+    q1.put(1)
+    q2.put(10)
+    q3.put('hello')
+    q2.put(15)
+    time.sleep(1)
+    q1.put('stop')
+    t.join()
+
+
+def func14():
+    """
+    在 UNIX 上加载守护进程
+
+    创建一个守护进程的步骤看上去不是很易懂，但是大体思想是这样的，
+    1. 守护进程从父进程中脱离，并将父进程终止。
+    2. 将守护进程从终端中分离开来。
+    3. 改变工作目录，使守护进程不在工作于加载它的目录之下。
+    4. 让守护进程失去获得新控制终端的能力。
+    5. 重新初始化标准 I/O 流，使其指向由用户指定的文件。
+    6. 将进程 ID 写入到一个文件中，以便稍后给其他的程序使用
     """
 
 
