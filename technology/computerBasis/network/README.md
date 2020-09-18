@@ -333,7 +333,7 @@ sequenceDiagram
 	client ->> server: ACK
 ```
 
-#### Ｃlosing a connection
+#### Closing a connection
 
 1. client host sends TCP FIN segment to server
 2. server host receives FIN, replies ACK, close connection, send FIN
@@ -343,6 +343,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
 	client ->> server: TCP FIN
+	server ->> client: ACK
 	note right of server: close connection
 	server ->> client: FIN 
 	client ->> server: ACK

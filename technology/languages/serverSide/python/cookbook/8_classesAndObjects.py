@@ -1431,6 +1431,7 @@ def func24():
     方案2: 使用functools.total_ordering装饰器, 然后定义__eq__()以及另一个比较方法, 那么装饰器会自动为我们实现其他的比较方法
     """
     from functools import total_ordering
+
     class Room:
         def __init__(self, name, length, width):
             self.name = name
