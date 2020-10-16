@@ -19,7 +19,7 @@
 
 * git revert    还原，撤销某次提交的修改
 
-* git cherry-pick    拣选，拣选特定的提交合入当前分钟
+* git cherry-pick    拣选，拣选特定的提交合入当前分支
 
 * git fetch    取回，下载远程分支，= git pull - git merge
 
