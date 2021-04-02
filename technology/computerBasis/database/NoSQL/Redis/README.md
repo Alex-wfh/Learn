@@ -1,7 +1,7 @@
 # Redis
 
 ## 简介
-Redis(REmote DIctionary Server) 是完全开源免费的，遵守BSD协议，是一个高性能的 key-value 数据库。
+Redis(Remote DIctionary Server) 是完全开源免费的，遵守BSD协议，是一个高性能的 key-value 数据库。
 
 ### 优势
 * 性能极高，Redis 能读的速度是110000次/s,写的速度是81000次/s；
